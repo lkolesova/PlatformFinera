@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Капітал · Адмін</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f6fb;--sidebar:#1e2235;--sidebar2:#252a40;
+  --glass:rgba(255,255,255,0.95);
+  --text:#1a1f2e;--text2:#4a5568;--text3:#8896aa;
+  --accent:#5b8dee;--accent-s:rgba(91,141,238,0.12);
+  --green:#2e9e6e;--green-s:rgba(46,158,110,0.12);
+  --red:#d0526a;--red-s:rgba(208,82,106,0.12);
+  --amber:#c47d22;--amber-s:rgba(196,125,34,0.12);
+  --purple:#7060d8;--purple-s:rgba(112,96,216,0.12);
+  --border:rgba(0,0,0,0.07);
+  --shadow:0 2px 12px rgba(0,0,0,0.07);
+  --sans:'Montserrat',sans-serif;--mono:'JetBrains Mono',monospace;
+  --r:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-family:var(--sans);font-size:14px;color:var(--text);background:var(--bg)}
+body{display:flex;min-height:100vh}
+input,textarea,select,button{font-family:var(--sans)}
+
+/* ── LOGIN ── */
+#login-screen{
+  position:fixed;inset:0;z-index:1000;
+  background:linear-gradient(135deg,#1e2235,#2d3460);
+  display:flex;align-items:center;justify-content:center;
+}
+.login-box{
+  background:#fff;border-radius:20px;padding:40px 44px;width:380px;
+  box-shadow:0 24px 80px rgba(0,0,0,0.3);
+}
+.login-logo{display:flex;align-items:center;gap:10px;margin-bottom:28px}
+.login-logo-mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#5b8dee,#7060d8);display:flex;align-items:center;justify-content:center;font-size:18px}
+.login-logo-text{font-size:18px;font-weight:800;letter-spacing:-.3px}
+.login-role{font-size:11px;padding:3px 10px;background:rgba(208,82,106,0.1);color:var(--red);border-radius:20px;font-weight:600;letter-spacing:.04em;margin-bottom:24px;display:inline-block}
+.login-field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.login-field label{font-size:12px;font-weight:600;color:var(--text2)}
+.login-input{padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-size:13.5px;outline:none;transition:border .15s}
+.login-input:focus{border-color:var(--accent)}
+.login-btn{width:100%;padding:12px;background:linear-gradient(135deg,#5b8dee,#7060d8);color:#fff;border:none;border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;transition:all .18s}
+.login-btn:hover{opacity:.9;transform:translateY(-1px)}
+.login-hint{font-size:11.5px;color:var(--text3);text-align:center;margin-top:16px}
+.login-error{font-size:12px;color:var(--red);background:var(--red-s);padding:8px 12px;border-radius:8px;margin-top:8px;display:none}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:240px;flex-shrink:0;position:fixed;top:0;bottom:0;
+  background:var(--sidebar);display:flex;flex-direction:column;overflow-y:auto;
+}
+.sb-logo{display:flex;align-items:center;gap:10px;padding:22px 20px;border-bottom:1px solid rgba(255,255,255,0.08)}
+.sb-logo-mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#5b8dee,#7060d8);display:flex;align-items:center;justify-content:center;font-size:14px}
+.sb-logo-text{font-size:15px;font-weight:700;color:#fff;letter-spacing:-.3px}
+.sb-logo-badge{font-size:9px;padding:2px 7px;background:rgba(208,82,106,0.25);color:#f87171;border-radius:4px;font-weight:700;letter-spacing:.06em;margin-left:6px}
+
+.sb-section{font-size:9px;letter-spacing:.15em;color:rgba(255,255,255,0.25);padding:20px 20px 6px;text-transform:uppercase;font-weight:600}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 20px;cursor:pointer;font-size:13px;color:rgba(255,255,255,0.55);transition:all .15s;margin:1px 8px;border-radius:8px;font-weight:500}
+.sb-item:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.85)}
+.sb-item.active{background:rgba(91,141,238,0.2);color:#fff;font-weight:600}
+.sb-icon{width:15px;height:15px;flex-shrink:0;opacity:.7}
+.sb-item.active .sb-icon{opacity:1}
+.sb-badge{margin-left:auto;font-size:9.5px;font-family:var(--mono);padding:2px 7px;border-radius:10px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.5)}
+.sb-item.active .sb-badge{background:rgba(91,141,238,0.35);color:#93c5fd}
+
+.sb-bottom{margin-top:auto;padding:16px;border-top:1px solid rgba(255,255,255,0.08)}
+.sb-admin{display:flex;align-items:center;gap:10px}
+.sb-ava{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#5b8dee,#7060d8);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.sb-admin-name{font-size:12.5px;font-weight:600;color:#fff}
+.sb-admin-role{font-size:10.5px;color:rgba(255,255,255,0.35)}
+.sb-logout{margin-left:auto;font-size:11px;color:rgba(255,255,255,0.3);cursor:pointer;padding:4px 8px;border-radius:6px;transition:all .15s;border:none;background:transparent}
+.sb-logout:hover{color:var(--red);background:rgba(208,82,106,0.12)}
+
+/* ── MAIN ── */
+.main{margin-left:240px;flex:1;padding:32px 36px;min-height:100vh}
+.apage{display:none}.apage.active{display:block}
+@keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.apage.active{animation:fu .18s ease}
+
+/* ── TOPBAR ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.page-title{font-size:22px;font-weight:700;letter-spacing:-.4px}
+.page-sub{font-size:12.5px;color:var(--text3);margin-top:2px}
+
+/* ── STAT CARDS ── */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stat-card{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;box-shadow:var(--shadow)}
+.stat-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:12px}
+.stat-label{font-size:10.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:5px}
+.stat-val{font-size:24px;font-weight:700;letter-spacing:-.5px}
+.stat-ch{font-size:11px;margin-top:3px;font-family:var(--mono);font-weight:500}
+.pos{color:var(--green)}.neg{color:var(--red)}
+
+/* ── TABLE ── */
+.table-wrap{background:#fff;border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.table-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+.table-title{font-size:13.5px;font-weight:700}
+.table-actions{display:flex;gap:8px}
+table{width:100%;border-collapse:collapse}
+thead th{font-size:10px;letter-spacing:.1em;color:var(--text3);text-transform:uppercase;font-weight:600;padding:10px 16px;text-align:left;border-bottom:1px solid var(--border);background:#fafbfc}
+tbody td{padding:12px 16px;font-size:12.5px;border-bottom:1px solid rgba(0,0,0,0.04)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:#fafbfc}
+.user-info{display:flex;align-items:center;gap:10px}
+.user-ava{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#5b8dee,#7060d8);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.user-name{font-weight:600;font-size:13px}
+.user-tg{font-size:11px;color:var(--text3);font-family:var(--mono)}
+
+/* ── STATUS BADGES ── */
+.status{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;font-family:var(--mono)}
+.status-active{background:var(--green-s);color:var(--green)}
+.status-blocked{background:var(--red-s);color:var(--red)}
+.status-draft{background:rgba(0,0,0,0.06);color:var(--text3)}
+.status-pub{background:var(--green-s);color:var(--green)}
+
+/* ── ACTION BUTTONS ── */
+.act-btn{padding:5px 11px;font-size:11px;font-weight:600;border:1px solid;border-radius:7px;cursor:pointer;transition:all .14s;font-family:var(--sans);background:transparent}
+.act-btn-blue{color:var(--accent);border-color:rgba(91,141,238,0.3)}
+.act-btn-blue:hover{background:var(--accent-s)}
+.act-btn-red{color:var(--red);border-color:rgba(208,82,106,0.3)}
+.act-btn-red:hover{background:var(--red-s)}
+.act-btn-green{color:var(--green);border-color:rgba(46,158,110,0.3)}
+.act-btn-green:hover{background:var(--green-s)}
+.act-btn-amber{color:var(--amber);border-color:rgba(196,125,34,0.3)}
+.act-btn-amber:hover{background:var(--amber-s)}
+
+/* ── BTN PRIMARY ── */
+.btn-primary{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;background:linear-gradient(135deg,#5b8dee,#7060d8);color:#fff;border:none;border-radius:var(--r);font-size:12.5px;font-weight:700;cursor:pointer;transition:all .18s;box-shadow:0 3px 10px rgba(91,141,238,0.25)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(91,141,238,0.35)}
+.btn-secondary{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;background:#fff;color:var(--text2);border:1px solid var(--border);border-radius:var(--r);font-size:12.5px;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-secondary:hover{background:#f8f9fa;border-color:rgba(91,141,238,0.3);color:var(--accent)}
+
+/* ── SEARCH ── */
+.search-input{padding:8px 14px;border:1px solid var(--border);border-radius:var(--r);font-size:12.5px;outline:none;width:220px;background:#fafbfc;transition:all .15s}
+.search-input:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px rgba(91,141,238,0.08)}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay.open{opacity:1;pointer-events:auto}
+.modal{background:#fff;border-radius:16px;padding:0;width:540px;max-width:90vw;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,0.2);transform:translateY(10px);transition:transform .2s}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-wide{width:720px}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border)}
+.modal-title{font-size:15px;font-weight:700}
+.modal-close{width:28px;height:28px;border-radius:50%;border:none;background:#f3f4f6;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:var(--text3);transition:all .15s}
+.modal-close:hover{background:var(--red-s);color:var(--red)}
+.modal-body{padding:24px;overflow-y:auto;flex:1}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px}
+
+/* ── FORM ── */
+.form-row{margin-bottom:16px}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.form-label{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;display:block}
+.form-input{width:100%;padding:9px 13px;border:1.5px solid var(--border);border-radius:var(--r);font-size:13px;outline:none;transition:border .15s;background:#fafbfc}
+.form-input:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px rgba(91,141,238,0.07)}
+.form-select{width:100%;padding:9px 13px;border:1.5px solid var(--border);border-radius:var(--r);font-size:13px;outline:none;background:#fafbfc;cursor:pointer}
+.form-select:focus{border-color:var(--accent)}
+.form-textarea{width:100%;padding:9px 13px;border:1.5px solid var(--border);border-radius:var(--r);font-size:13px;outline:none;resize:vertical;min-height:90px;transition:border .15s;background:#fafbfc}
+.form-textarea:focus{border-color:var(--accent);background:#fff}
+.form-hint{font-size:11px;color:var(--text3);margin-top:4px}
+.form-section{font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin:20px 0 12px;padding-top:16px;border-top:1px solid var(--border)}
+.form-section:first-of-type{margin-top:0;padding-top:0;border-top:none}
+
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0}
+.toggle-label{font-size:13px;font-weight:500}
+.toggle-sub{font-size:11.5px;color:var(--text3)}
+.toggle{width:40px;height:22px;background:#e5e7eb;border-radius:11px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
+.toggle.on{background:var(--green)}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,0.2)}
+.toggle.on::after{left:21px}
+
+/* ── COURSE TREE ── */
+.tree-wrap{background:#fafbfc;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.tree-module{border-bottom:1px solid var(--border)}
+.tree-module:last-child{border-bottom:none}
+.tree-module-header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:#fff;cursor:pointer;transition:background .15s}
+.tree-module-header:hover{background:#f3f4f6}
+.tree-module-arrow{font-size:10px;color:var(--text3);transition:transform .2s;flex-shrink:0}
+.tree-module-arrow.open{transform:rotate(90deg)}
+.tree-module-name{flex:1;font-size:13px;font-weight:700}
+.tree-module-meta{font-size:11px;color:var(--text3);font-family:var(--mono)}
+.tree-module-actions{display:flex;gap:6px}
+.tree-lessons{border-top:1px solid var(--border)}
+.tree-lesson{display:flex;align-items:center;gap:10px;padding:9px 16px 9px 36px;border-bottom:1px solid rgba(0,0,0,0.04);transition:background .12s}
+.tree-lesson:last-child{border-bottom:none}
+.tree-lesson:hover{background:rgba(91,141,238,0.04)}
+.tree-lesson-icon{font-size:12px;flex-shrink:0}
+.tree-lesson-name{flex:1;font-size:12.5px;color:var(--text2)}
+.tree-lesson-dur{font-size:11px;color:var(--text3);font-family:var(--mono)}
+.free-tag{font-size:9.5px;padding:2px 7px;background:var(--green-s);color:var(--green);border-radius:10px;font-weight:600;font-family:var(--mono)}
+.drag-handle{cursor:grab;color:var(--text3);font-size:14px;padding:2px;opacity:.4;transition:opacity .15s}
+.drag-handle:hover{opacity:1}
+
+/* ── PROGRESS BAR ── */
+.prog-bar{height:5px;background:rgba(0,0,0,0.06);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--purple))}
+
+/* ── ANALYTICS CARDS ── */
+.analytics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.an-card{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:18px;box-shadow:var(--shadow)}
+.an-card-title{font-size:13.5px;font-weight:700;margin-bottom:14px}
+.an-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(0,0,0,0.05)}
+.an-row:last-child{border-bottom:none}
+.an-key{font-size:12.5px;color:var(--text2)}
+.an-val{font-size:12.5px;font-family:var(--mono);font-weight:600}
+
+/* ── PROFILE DRAWER ── */
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.35);backdrop-filter:blur(3px);z-index:400;opacity:0;pointer-events:none;transition:opacity .2s}
+.drawer-overlay.open{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:420px;background:#fff;z-index:401;box-shadow:-8px 0 40px rgba(0,0,0,0.15);transform:translateX(100%);transition:transform .25s ease;overflow-y:auto;display:flex;flex-direction:column}
+.drawer-overlay.open .drawer{transform:translateX(0)}
+.drawer-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px}
+.drawer-ava{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#5b8dee,#7060d8);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0}
+.drawer-name{font-size:15px;font-weight:700}
+.drawer-tg{font-size:12px;color:var(--text3);font-family:var(--mono)}
+.drawer-close{margin-left:auto;width:28px;height:28px;border-radius:50%;border:none;background:#f3f4f6;cursor:pointer;font-size:16px;color:var(--text3)}
+.drawer-body{padding:20px 24px;flex:1}
+.drawer-section{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin:16px 0 10px}
+.drawer-stat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.drawer-stat{background:#fafbfc;border:1px solid var(--border);border-radius:var(--r);padding:12px}
+.drawer-stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;font-weight:600;margin-bottom:4px}
+.drawer-stat-val{font-size:18px;font-weight:700}
+.course-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(0,0,0,0.05)}
+.course-item:last-child{border-bottom:none}
+.course-item-icon{font-size:20px;flex-shrink:0}
+.course-item-name{font-size:13px;font-weight:600;flex:1}
+.course-item-prog{font-size:11px;color:var(--text3);margin-top:3px}
+.drawer-actions{padding:20px 24px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap}
+
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.1);border-radius:2px}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-mark">◈</div>
+      <span style="font-size:18px;font-weight:800">Капітал</span>
+    </div>
+    <div class="login-role">ADMIN PANEL</div>
+    <div class="form-row">
+      <label class="form-label">Логін</label>
+      <input class="login-input" id="login-user" type="text" placeholder="admin" value="admin">
+    </div>
+    <div class="form-row">
+      <label class="form-label">Пароль</label>
+      <input class="login-input" id="login-pass" type="password" placeholder="••••••••" value="admin123">
+    </div>
+    <div class="login-error" id="login-error">Невірний логін або пароль</div>
+    <button class="login-btn" onclick="doLogin()">Увійти в адмін-панель</button>
+    <div class="login-hint">Демо: admin / admin123</div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar" style="display:none">
+  <div class="sb-logo">
+    <div class="sb-logo-mark">◈</div>
+    <span class="sb-logo-text">Капітал</span>
+    <span class="sb-logo-badge">ADMIN</span>
+  </div>
+
+  <div class="sb-section">Огляд</div>
+  <div class="sb-item active" onclick="showPage('dashboard',this)">
+    <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="9" height="9" rx="1"/><rect x="13" y="3" width="9" height="9" rx="1"/><rect x="2" y="14" width="9" height="9" rx="1"/><rect x="13" y="14" width="9" height="9" rx="1"/></svg>
+    Дашборд
+  </div>
+  <div class="sb-item" onclick="showPage('analytics',this)">
+    <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Аналітика
+  </div>
+
+  <div class="sb-section">Управління</div>
+  <div class="sb-item" onclick="showPage('users',this)">
+    <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Користувачі
+    <span class="sb-badge">247</span>
+  </div>
+  <div class="sb-item" onclick="showPage('courses',this)">
+    <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+    Курси
+    <span class="sb-badge">8</span>
+  </div>
+  <div class="sb-item" onclick="showPage('sales',this)">
+    <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+    Продажі
+  </div>
+
+  <div class="sb-bottom">
+    <div class="sb-admin">
+      <div class="sb-ava">A</div>
+      <div>
+        <div class="sb-admin-name">Admin</div>
+        <div class="sb-admin-role">Супер-адмін</div>
+      </div>
+      <button class="sb-logout" onclick="doLogout()" title="Вийти">⏻</button>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main" id="main-content" style="display:none">
+
+<!-- ══ DASHBOARD ══ -->
+<div class="apage active" id="apage-dashboard">
+  <div class="topbar">
+    <div>
+      <div class="page-title">Дашборд</div>
+      <div class="page-sub">Загальний огляд платформи</div>
+    </div>
+    <div style="font-size:12px;color:var(--text3);font-family:var(--mono)">Сьогодні, 10 травня 2025</div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--accent-s)">👥</div>
+      <div class="stat-label">Всього юзерів</div>
+      <div class="stat-val">247</div>
+      <div class="stat-ch pos">▲ +18 за тиждень</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--green-s)">💰</div>
+      <div class="stat-label">Виручка цього місяця</div>
+      <div class="stat-val">₴42,380</div>
+      <div class="stat-ch pos">▲ +23% vs минулий місяць</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--purple-s)">📚</div>
+      <div class="stat-label">Продажів курсів</div>
+      <div class="stat-val">34</div>
+      <div class="stat-ch pos">▲ цього місяця</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--amber-s)">🎓</div>
+      <div class="stat-label">Сертифікатів видано</div>
+      <div class="stat-val">12</div>
+      <div class="stat-ch" style="color:var(--text3)">Загалом</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div class="table-wrap">
+      <div class="table-head">
+        <div class="table-title">Останні реєстрації</div>
+        <button class="btn-secondary" style="font-size:11.5px;padding:6px 12px" onclick="showPage('users',document.querySelectorAll('.sb-item')[3])">Всі юзери →</button>
+      </div>
+      <table>
+        <thead><tr><th>Ім'я</th><th>Дата</th><th>Статус</th></tr></thead>
+        <tbody id="recent-users-table"></tbody>
+      </table>
+    </div>
+    <div class="table-wrap">
+      <div class="table-head">
+        <div class="table-title">Останні продажі</div>
+        <button class="btn-secondary" style="font-size:11.5px;padding:6px 12px" onclick="showPage('sales',document.querySelectorAll('.sb-item')[5])">Всі продажі →</button>
+      </div>
+      <table>
+        <thead><tr><th>Юзер</th><th>Курс</th><th>Сума</th></tr></thead>
+        <tbody id="recent-sales-table"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ USERS ══ -->
+<div class="apage" id="apage-users">
+  <div class="topbar">
+    <div>
+      <div class="page-title">Користувачі</div>
+      <div class="page-sub">Управління акаунтами</div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <input class="search-input" placeholder="🔍 Пошук по імені або @username..." oninput="filterUsers(this.value)">
+      <button class="btn-primary" onclick="openModal('modal-create-user')">+ Створити юзера</button>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Користувач</th>
+          <th>Дата реєстрації</th>
+          <th>Останній вхід</th>
+          <th>Куплено курсів</th>
+          <th>Статус</th>
+          <th>Дії</th>
+        </tr>
+      </thead>
+      <tbody id="users-table"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ COURSES ══ -->
+<div class="apage" id="apage-courses">
+  <div class="topbar">
+    <div>
+      <div class="page-title">Курси</div>
+      <div class="page-sub">Управління навчальним контентом</div>
+    </div>
+    <button class="btn-primary" onclick="openModal('modal-create-course')">+ Новий курс</button>
+  </div>
+
+  <div class="table-wrap" style="margin-bottom:20px">
+    <table>
+      <thead>
+        <tr>
+          <th>Курс</th>
+          <th>Модулів</th>
+          <th>Уроків</th>
+          <th>Студентів</th>
+          <th>Виручка</th>
+          <th>Статус</th>
+          <th>Дії</th>
+        </tr>
+      </thead>
+      <tbody id="courses-table"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ COURSE EDITOR ══ -->
+<div class="apage" id="apage-course-editor">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="btn-secondary" style="font-size:12px;padding:7px 14px" onclick="showPage('courses',document.querySelectorAll('.sb-item')[4])">← Курси</button>
+      <div>
+        <div class="page-title" id="editor-title">Редактор курсу</div>
+        <div class="page-sub" id="editor-sub"></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn-secondary" onclick="alert('Збережено як чернетку')">Зберегти чернетку</button>
+      <button class="btn-primary" onclick="alert('Курс опубліковано!')">Опублікувати</button>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 380px;gap:20px">
+    <div id="editor-content"></div>
+    <div style="display:flex;flex-direction:column;gap:14px" id="editor-sidebar"></div>
+  </div>
+</div>
+
+<!-- ══ ANALYTICS ══ -->
+<div class="apage" id="apage-analytics">
+  <div class="topbar">
+    <div>
+      <div class="page-title">Аналітика</div>
+      <div class="page-sub">Детальна статистика платформи</div>
+    </div>
+    <div style="display:flex;gap:6px">
+      <button class="act-btn act-btn-blue" onclick="setAnPeriod('7d',this)">7 днів</button>
+      <button class="act-btn act-btn-blue" onclick="setAnPeriod('30d',this)">30 днів</button>
+      <button class="act-btn act-btn-blue" onclick="setAnPeriod('all',this)">Весь час</button>
+    </div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-card"><div class="stat-icon" style="background:var(--accent-s)">👥</div><div class="stat-label">Нових юзерів</div><div class="stat-val" id="an-users">18</div><div class="stat-ch pos">▲ за 7 днів</div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:var(--green-s)">💰</div><div class="stat-label">Виручка</div><div class="stat-val" id="an-rev">₴9,820</div><div class="stat-ch pos">▲ vs минулий тиждень</div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:var(--purple-s)">🛒</div><div class="stat-label">Продажів</div><div class="stat-val" id="an-sales">8</div><div class="stat-ch" style="color:var(--text3)">за 7 днів</div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:var(--amber-s)">📊</div><div class="stat-label">Конверсія</div><div class="stat-val" id="an-conv">3.2%</div><div class="stat-ch pos">↑ відвідувачів→покупців</div></div>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-head"><div class="table-title">Аналітика по курсах</div></div>
+    <table>
+      <thead><tr><th>Курс</th><th>Студентів</th><th>Середній прогрес</th><th>Завершили</th><th>Виручка</th><th>Рейтинг</th></tr></thead>
+      <tbody id="analytics-courses-table"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ SALES ══ -->
+<div class="apage" id="apage-sales">
+  <div class="topbar">
+    <div><div class="page-title">Продажі</div><div class="page-sub">Всі транзакції</div></div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Дата</th><th>Юзер</th><th>Курс</th><th>Сума</th><th>Статус</th></tr></thead>
+      <tbody id="sales-table"></tbody>
+    </table>
+  </div>
+</div>
+
+</main>
+
+<!-- ══ MODAL: CREATE USER ══ -->
+<div class="modal-overlay" id="modal-create-user">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Створити користувача</div>
+      <button class="modal-close" onclick="closeModal('modal-create-user')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-section">Основні дані</div>
+      <div class="form-row"><label class="form-label">Ім'я</label><input class="form-input" placeholder="Ім'я Прізвище"></div>
+      <div class="form-row-2">
+        <div><label class="form-label">Email</label><input class="form-input" type="email" placeholder="email@example.com"></div>
+        <div><label class="form-label">Telegram ID або @username</label><input class="form-input" placeholder="@username"></div>
+      </div>
+      <div class="form-row-2">
+        <div>
+          <label class="form-label">Роль</label>
+          <select class="form-select">
+            <option value="user">Студент</option>
+            <option value="admin">Адмін</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Статус</label>
+          <select class="form-select">
+            <option value="active">Активний</option>
+            <option value="blocked">Заблокований</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-section">Доступ до курсів</div>
+      <div style="font-size:12.5px;color:var(--text3);margin-bottom:10px">Додай курси без оплати (тестування, подарунки)</div>
+      <div id="add-courses-list" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-create-user')">Скасувати</button>
+      <button class="btn-primary" onclick="createUser()">Створити</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: CREATE COURSE ══ -->
+<div class="modal-overlay" id="modal-create-course">
+  <div class="modal modal-wide">
+    <div class="modal-header">
+      <div class="modal-title">Новий курс</div>
+      <button class="modal-close" onclick="closeModal('modal-create-course')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-section">Основна інформація</div>
+      <div class="form-row"><label class="form-label">Назва курсу</label><input class="form-input" id="new-course-name" placeholder="Наприклад: Інвестиції з нуля"></div>
+      <div class="form-row"><label class="form-label">Короткий опис (для картки в каталозі)</label><input class="form-input" placeholder="1-2 речення що чіпляють"></div>
+      <div class="form-row"><label class="form-label">Повний опис (для сторінки курсу)</label><textarea class="form-textarea" placeholder="Детальний опис курсу, що отримає студент, методологія..."></textarea></div>
+      <div class="form-row-2">
+        <div>
+          <label class="form-label">Ціна (₴)</label>
+          <input class="form-input" type="number" placeholder="1290">
+        </div>
+        <div>
+          <label class="form-label">Стара ціна (₴, необов'язково)</label>
+          <input class="form-input" type="number" placeholder="1890">
+        </div>
+      </div>
+      <div class="form-row-2">
+        <div>
+          <label class="form-label">Рівень</label>
+          <select class="form-select"><option>Початківець</option><option>Середній</option><option>Просунутий</option><option>Будь-який</option></select>
+        </div>
+        <div>
+          <label class="form-label">Тег</label>
+          <select class="form-select"><option value="">— Без тега —</option><option>Хіт</option><option>Новий</option><option>Скоро</option></select>
+        </div>
+      </div>
+
+      <div class="form-section">Для кого / Що отримає студент</div>
+      <div class="form-row-2">
+        <div><label class="form-label">Для кого курс (кожен рядок — окремий пункт)</label><textarea class="form-textarea" placeholder="Хочеш почати інвестувати&#10;Вже маєш рахунок але не розумієш що купувати"></textarea></div>
+        <div><label class="form-label">Що отримає студент</label><textarea class="form-textarea" placeholder="Відкриєш брокерський рахунок&#10;Купиш перші акції впевнено"></textarea></div>
+      </div>
+
+      <div class="form-section">Автор</div>
+      <div class="form-row-2">
+        <div><label class="form-label">Ім'я автора</label><input class="form-input" placeholder="Олена Ковальчук"></div>
+        <div><label class="form-label">Роль / регалії</label><input class="form-input" placeholder="CFA, 12 років в інвестиціях"></div>
+      </div>
+      <div class="form-row"><label class="form-label">Біографія</label><textarea class="form-textarea" style="min-height:70px" placeholder="Портфельний менеджер у топ-10 фонді..."></textarea></div>
+
+      <div class="form-section">Публікація</div>
+      <div class="toggle-row">
+        <div><div class="toggle-label">Опублікувати одразу</div><div class="toggle-sub">Якщо вимкнено — курс збережеться як чернетка</div></div>
+        <div class="toggle" id="pub-toggle" onclick="this.classList.toggle('on')"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-create-course')">Скасувати</button>
+      <button class="btn-primary" onclick="createCourse()">Створити та додати уроки →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: ADD LESSON ══ -->
+<div class="modal-overlay" id="modal-add-lesson">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="lesson-modal-title">Додати урок</div>
+      <button class="modal-close" onclick="closeModal('modal-add-lesson')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row"><label class="form-label">Назва уроку</label><input class="form-input" placeholder="Що таке акція і як вона зростає"></div>
+      <div class="form-row"><label class="form-label">Посилання на відео (Vimeo, YouTube, Wistia)</label><input class="form-input" placeholder="https://vimeo.com/..."></div>
+      <div class="form-row"><label class="form-label">Тривалість</label><input class="form-input" placeholder="14 хв"></div>
+      <div class="form-row"><label class="form-label">Конспект (текст або Markdown)</label><textarea class="form-textarea" style="min-height:120px" placeholder="Ключові тези уроку..."></textarea></div>
+      <div class="form-row"><label class="form-label">Матеріали (посилання або назви файлів)</label><textarea class="form-textarea" style="min-height:60px" placeholder="Слайди.pdf&#10;Таблиця-розрахунків.xlsx"></textarea></div>
+      <div class="toggle-row">
+        <div><div class="toggle-label">Безкоштовний перегляд</div><div class="toggle-sub">Урок доступний без покупки курсу</div></div>
+        <div class="toggle" onclick="this.classList.toggle('on')"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-add-lesson')">Скасувати</button>
+      <button class="btn-primary" onclick="addLesson()">Додати урок</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: ADD MODULE ══ -->
+<div class="modal-overlay" id="modal-add-module">
+  <div class="modal" style="width:400px">
+    <div class="modal-header">
+      <div class="modal-title">Додати модуль</div>
+      <button class="modal-close" onclick="closeModal('modal-add-module')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row"><label class="form-label">Назва модуля</label><input class="form-input" placeholder="Модуль 1. Основи фінансового ринку"></div>
+      <div class="form-row"><label class="form-label">Короткий опис (необов'язково)</label><input class="form-input" placeholder="Що охоплює цей модуль"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-add-module')">Скасувати</button>
+      <button class="btn-primary" onclick="addModule()">Додати</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ USER PROFILE DRAWER ══ -->
+<div class="drawer-overlay" id="drawer-user" onclick="e=>e.target===this&&closeDrawer()">
+  <div class="drawer" id="drawer-content">
+    <!-- filled by JS -->
+  </div>
+</div>
+
+<script>
+// ══ DATA ══
+const USERS = [
+  {id:1,name:'Марія Коваль',tg:'@maria_koval',reg:'02.03.2025',last:'09.05.2025',courses:2,status:'active',progress:[{name:'Інвестиції з нуля',pct:65,emoji:'📈'},{name:'Дивідендний портфель',pct:20,emoji:'💰'}]},
+  {id:2,name:'Олег Петренко',tg:'@oleg_p',reg:'15.03.2025',last:'08.05.2025',courses:1,status:'active',progress:[{name:'Фундаментальний аналіз',pct:35,emoji:'🔬'}]},
+  {id:3,name:'Наталія Бондар',tg:'@natalia_b',reg:'20.03.2025',last:'07.05.2025',courses:0,status:'active',progress:[]},
+  {id:4,name:'Дмитро Савченко',tg:'@dmytro_s',reg:'01.04.2025',last:'05.05.2025',courses:3,status:'active',progress:[{name:'Інвестиції з нуля',pct:100,emoji:'📈'},{name:'ETF та фонди',pct:80,emoji:'📊'},{name:'Психологія',pct:45,emoji:'🧠'}]},
+  {id:5,name:'Юлія Ткач',tg:'@yulia_tk',reg:'10.04.2025',last:'01.05.2025',courses:0,status:'blocked',progress:[]},
+  {id:6,name:'Андрій Мороз',tg:'@andriy_m',reg:'18.04.2025',last:'09.05.2025',courses:1,status:'active',progress:[{name:'ETF та фонди',pct:55,emoji:'📊'}]},
+  {id:7,name:'Ірина Гончар',tg:'@iryna_g',reg:'25.04.2025',last:'10.05.2025',courses:2,status:'active',progress:[{name:'Дивідендний портфель',pct:90,emoji:'💰'},{name:'Інвестиції з нуля',pct:100,emoji:'📈'}]},
+];
+
+const COURSES_DATA = [
+  {id:1,title:'Інвестиції з нуля',emoji:'📈',modules:3,lessons:9,students:89,revenue:'₴115,010',status:'pub',avg:58,done:24,rating:4.9,
+    mods:[
+      {title:'Модуль 1. Основи фінансового ринку',lessons:[
+        {title:'Що таке акція і чому вона зростає',dur:'12 хв',free:true},
+        {title:'Як обрати брокера',dur:'18 хв',free:false},
+        {title:'Відкриття рахунку покроково',dur:'15 хв',free:false},
+      ]},
+      {title:'Модуль 2. Перші покупки',lessons:[
+        {title:'Як читати котирування',dur:'14 хв',free:false},
+        {title:'Маркет vs лімітний ордер',dur:'10 хв',free:false},
+        {title:'Перша покупка: практична сесія',dur:'22 хв',free:false},
+      ]},
+      {title:'Модуль 3. Диверсифікація',lessons:[
+        {title:'Чому не можна всі гроші в одну акцію',dur:'16 хв',free:false},
+        {title:'Секторна диверсифікація',dur:'13 хв',free:false},
+        {title:'Збалансований портфель: приклади',dur:'20 хв',free:false},
+      ]},
+    ]},
+  {id:2,title:'Дивідендний портфель',emoji:'💰',modules:3,lessons:8,students:54,revenue:'₴85,860',status:'pub',avg:38,done:11,rating:4.8,mods:[]},
+  {id:3,title:'Фундаментальний аналіз',emoji:'🔬',modules:2,lessons:8,students:32,revenue:'₴63,680',status:'pub',avg:25,done:4,rating:4.9,mods:[]},
+  {id:4,title:'ETF та індексне інвестування',emoji:'📊',modules:2,lessons:7,students:41,revenue:'₴36,490',status:'pub',avg:62,done:18,rating:4.7,mods:[]},
+  {id:5,title:'Психологія інвестора',emoji:'🧠',modules:1,lessons:3,students:28,revenue:'₴19,320',status:'pub',avg:71,done:15,rating:4.8,mods:[]},
+  {id:6,title:'Технічний аналіз для інвестора',emoji:'📉',modules:1,lessons:2,students:19,revenue:'₴22,610',status:'pub',avg:44,done:6,rating:4.6,mods:[]},
+  {id:7,title:'Рентні стратегії: REIT та BDC',emoji:'🏢',modules:0,lessons:0,students:0,revenue:'₴0',status:'draft',avg:0,done:0,rating:0,mods:[]},
+  {id:8,title:'Податки інвестора в Україні',emoji:'🧾',modules:0,lessons:0,students:0,revenue:'₴0',status:'draft',avg:0,done:0,rating:0,mods:[]},
+];
+
+const SALES = [
+  {date:'10.05.2025',user:'Марія Коваль',course:'Дивідендний портфель',sum:'₴1,590',status:'paid'},
+  {date:'09.05.2025',user:'Андрій Мороз',course:'ETF та індексне інвестування',sum:'₴890',status:'paid'},
+  {date:'09.05.2025',user:'Ірина Гончар',course:'Психологія інвестора',sum:'₴690',status:'paid'},
+  {date:'08.05.2025',user:'Олег Петренко',course:'Фундаментальний аналіз',sum:'₴1,990',status:'paid'},
+  {date:'07.05.2025',user:'Наталія Бондар',course:'Інвестиції з нуля',sum:'₴1,290',status:'paid'},
+  {date:'06.05.2025',user:'Дмитро Савченко',course:'Технічний аналіз',sum:'₴1,190',status:'paid'},
+];
+
+// ══ AUTH ══
+function doLogin() {
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value.trim();
+  const err = document.getElementById('login-error');
+  if (u === 'admin' && p === 'admin123') {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('sidebar').style.display = 'flex';
+    document.getElementById('main-content').style.display = 'block';
+    renderAll();
+  } else {
+    err.style.display = 'block';
+    setTimeout(()=> err.style.display='none', 2500);
+  }
+}
+document.addEventListener('keydown', e => { if (e.key==='Enter' && document.getElementById('login-screen').style.display !== 'none') doLogin(); });
+
+function doLogout() {
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('sidebar').style.display = 'none';
+  document.getElementById('main-content').style.display = 'none';
+}
+
+// ══ NAVIGATION ══
+function showPage(id, el) {
+  document.querySelectorAll('.apage').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(n => n.classList.remove('active'));
+  const pg = document.getElementById('apage-' + id);
+  if (pg) pg.classList.add('active');
+  if (el && el.classList) el.classList.add('active');
+}
+
+// ══ MODALS ══
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
+});
+
+// ══ RENDER ALL ══
+function renderAll() {
+  renderDashboard();
+  renderUsers(USERS);
+  renderCourses();
+  renderAnalyticsCourses();
+  renderSales();
+  populateAddCoursesList();
+}
+
+// ══ DASHBOARD ══
+function renderDashboard() {
+  const recentU = USERS.slice(0,5);
+  document.getElementById('recent-users-table').innerHTML = recentU.map(u=>`<tr>
+    <td><div class="user-info"><div class="user-ava">${u.name[0]}</div><div><div class="user-name">${u.name}</div><div class="user-tg">${u.tg}</div></div></div></td>
+    <td style="font-family:var(--mono);font-size:12px;color:var(--text3)">${u.reg}</td>
+    <td><span class="status ${u.status==='active'?'status-active':'status-blocked'}">${u.status==='active'?'Активний':'Заблок.'}</span></td>
+  </tr>`).join('');
+
+  document.getElementById('recent-sales-table').innerHTML = SALES.slice(0,5).map(s=>`<tr>
+    <td style="font-size:12.5px">${s.user}</td>
+    <td style="font-size:12px;color:var(--text3)">${s.course}</td>
+    <td style="font-family:var(--mono);font-size:12px;font-weight:600;color:var(--green)">${s.sum}</td>
+  </tr>`).join('');
+}
+
+// ══ USERS ══
+let usersFiltered = [...USERS];
+
+function filterUsers(q) {
+  const ql = q.toLowerCase();
+  usersFiltered = q ? USERS.filter(u => u.name.toLowerCase().includes(ql) || u.tg.toLowerCase().includes(ql)) : [...USERS];
+  renderUsers(usersFiltered);
+}
+
+function renderUsers(list) {
+  document.getElementById('users-table').innerHTML = list.map(u => `<tr>
+    <td>
+      <div class="user-info">
+        <div class="user-ava">${u.name[0]}</div>
+        <div><div class="user-name">${u.name}</div><div class="user-tg">${u.tg}</div></div>
+      </div>
+    </td>
+    <td style="font-family:var(--mono);font-size:12px;color:var(--text3)">${u.reg}</td>
+    <td style="font-family:var(--mono);font-size:12px;color:var(--text3)">${u.last}</td>
+    <td style="font-family:var(--mono);font-size:12.5px;font-weight:600">${u.courses}</td>
+    <td><span class="status ${u.status==='active'?'status-active':'status-blocked'}">${u.status==='active'?'● Активний':'● Заблоков.'}</span></td>
+    <td>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="act-btn act-btn-blue" onclick="openUserDrawer(${u.id})">Профіль</button>
+        <button class="act-btn act-btn-amber" onclick="grantCourse(${u.id})">+ Курс</button>
+        <button class="act-btn ${u.status==='active'?'act-btn-red':'act-btn-green'}" onclick="toggleBlock(${u.id})">${u.status==='active'?'Блокувати':'Розблок.'}</button>
+      </div>
+    </td>
+  </tr>`).join('');
+}
+
+function toggleBlock(id) {
+  const u = USERS.find(u => u.id===id);
+  if (!u) return;
+  u.status = u.status === 'active' ? 'blocked' : 'active';
+  renderUsers(usersFiltered);
+}
+
+function grantCourse(id) {
+  const course = prompt('Введи назву або ID курсу для додавання:');
+  if (course) alert(`✓ Курс "${course}" додано юзеру #${id} без оплати`);
+}
+
+function openUserDrawer(id) {
+  const u = USERS.find(u => u.id===id);
+  if (!u) return;
+  document.getElementById('drawer-content').innerHTML = `
+    <div class="drawer-header">
+      <div class="drawer-ava">${u.name[0]}</div>
+      <div><div class="drawer-name">${u.name}</div><div class="drawer-tg">${u.tg}</div></div>
+      <button class="drawer-close" onclick="closeDrawer()">✕</button>
+    </div>
+    <div class="drawer-body">
+      <div class="drawer-stat-row">
+        <div class="drawer-stat"><div class="drawer-stat-label">Реєстрація</div><div class="drawer-stat-val" style="font-size:14px;font-family:var(--mono)">${u.reg}</div></div>
+        <div class="drawer-stat"><div class="drawer-stat-label">Останній вхід</div><div class="drawer-stat-val" style="font-size:14px;font-family:var(--mono)">${u.last}</div></div>
+        <div class="drawer-stat"><div class="drawer-stat-label">Куплено курсів</div><div class="drawer-stat-val">${u.courses}</div></div>
+        <div class="drawer-stat"><div class="drawer-stat-label">Статус</div><div class="drawer-stat-val" style="font-size:14px;color:${u.status==='active'?'var(--green)':'var(--red)'}">${u.status==='active'?'Активний':'Заблокований'}</div></div>
+      </div>
+      <div class="drawer-section">Куплені курси</div>
+      ${u.courses === 0 ? '<div style="font-size:13px;color:var(--text3);padding:10px 0">Ще не придбано жодного курсу</div>' :
+        u.progress.map(c => `<div class="course-item">
+          <div class="course-item-icon">${c.emoji}</div>
+          <div style="flex:1">
+            <div class="course-item-name">${c.name}</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:5px">
+              <div style="flex:1;height:4px;background:rgba(0,0,0,0.06);border-radius:2px;overflow:hidden"><div style="height:100%;width:${c.pct}%;background:linear-gradient(90deg,var(--accent),var(--purple));border-radius:2px"></div></div>
+              <span style="font-family:var(--mono);font-size:11px;color:${c.pct===100?'var(--green)':'var(--accent)'};font-weight:600">${c.pct}%</span>
+            </div>
+          </div>
+          ${c.pct < 100 ? `<button class="act-btn act-btn-amber" onclick="alert('Прогрес по курсу скинуто')" style="font-size:10.5px">Скинути</button>` : '<span style="font-size:11px;color:var(--green);font-weight:600">✓ Завершено</span>'}
+        </div>`).join('')
+      }
+    </div>
+    <div class="drawer-actions">
+      <button class="act-btn act-btn-amber" onclick="grantCourse(${u.id})">+ Додати курс</button>
+      <button class="act-btn ${u.status==='active'?'act-btn-red':'act-btn-green'}" onclick="toggleBlock(${u.id});this.closest('.drawer-overlay').classList.remove('open')">${u.status==='active'?'Заблокувати':'Розблокувати'}</button>
+    </div>`;
+  document.getElementById('drawer-user').classList.add('open');
+}
+
+function closeDrawer() { document.getElementById('drawer-user').classList.remove('open'); }
+document.getElementById('drawer-user').addEventListener('click', e => { if (e.target===document.getElementById('drawer-user')) closeDrawer(); });
+
+// ══ COURSES ══
+let activeCourseId = null;
+
+function renderCourses() {
+  document.getElementById('courses-table').innerHTML = COURSES_DATA.map(c => `<tr>
+    <td>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:32px;height:32px;background:#f3f4f6;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">${c.emoji}</div>
+        <div><div style="font-weight:600;font-size:13px">${c.title}</div></div>
+      </div>
+    </td>
+    <td style="font-family:var(--mono);font-size:12.5px">${c.modules}</td>
+    <td style="font-family:var(--mono);font-size:12.5px">${c.lessons}</td>
+    <td style="font-family:var(--mono);font-size:12.5px">${c.students}</td>
+    <td style="font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--green)">${c.revenue}</td>
+    <td><span class="status ${c.status==='pub'?'status-pub':'status-draft'}">${c.status==='pub'?'● Опублікований':'Чернетка'}</span></td>
+    <td>
+      <div style="display:flex;gap:6px">
+        <button class="act-btn act-btn-blue" onclick="openCourseEditor(${c.id})">Редагувати</button>
+        <button class="act-btn ${c.status==='pub'?'act-btn-amber':'act-btn-green'}" onclick="toggleCourseStatus(${c.id})">${c.status==='pub'?'Зняти':'Опубл.'}</button>
+      </div>
+    </td>
+  </tr>`).join('');
+}
+
+function toggleCourseStatus(id) {
+  const c = COURSES_DATA.find(c=>c.id===id);
+  if (c) { c.status = c.status==='pub'?'draft':'pub'; renderCourses(); }
+}
+
+function openCourseEditor(id) {
+  activeCourseId = id;
+  const c = COURSES_DATA.find(c=>c.id===id);
+  document.getElementById('editor-title').textContent = c.title;
+  document.getElementById('editor-sub').textContent = `${c.emoji} · ${c.modules} модулів · ${c.lessons} уроків`;
+
+  // Main content — curriculum tree
+  document.getElementById('editor-content').innerHTML = `
+    <div class="table-wrap" style="margin-bottom:14px">
+      <div class="table-head">
+        <div class="table-title">Структура курсу</div>
+        <button class="btn-primary" style="font-size:12px;padding:7px 14px" onclick="openModal('modal-add-module')">+ Додати модуль</button>
+      </div>
+      <div style="padding:14px">
+        <div class="tree-wrap" id="course-tree"></div>
+      </div>
+    </div>`;
+
+  // Sidebar
+  document.getElementById('editor-sidebar').innerHTML = `
+    <div class="table-wrap">
+      <div class="table-head"><div class="table-title">Основна інфо</div></div>
+      <div style="padding:16px;display:flex;flex-direction:column;gap:12px">
+        <div><label class="form-label">Назва</label><input class="form-input" value="${c.title}"></div>
+        <div><label class="form-label">Ціна (₴)</label><input class="form-input" value="1290" type="number"></div>
+        <div><label class="form-label">Статус</label>
+          <select class="form-select">
+            <option ${c.status==='pub'?'selected':''}>Опублікований</option>
+            <option ${c.status==='draft'?'selected':''}>Чернетка</option>
+          </select>
+        </div>
+        <button class="btn-primary" onclick="alert('Збережено!')">Зберегти</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <div class="table-head"><div class="table-title">Статистика</div></div>
+      <div style="padding:16px">
+        <div class="an-row"><span class="an-key">Студентів</span><span class="an-val">${c.students}</span></div>
+        <div class="an-row"><span class="an-key">Завершили</span><span class="an-val">${c.done}</span></div>
+        <div class="an-row"><span class="an-key">Середній прогрес</span><span class="an-val">${c.avg}%</span></div>
+        <div class="an-row"><span class="an-key">Виручка</span><span class="an-val" style="color:var(--green)">${c.revenue}</span></div>
+        <div style="margin-top:10px"><div class="prog-bar"><div class="prog-fill" style="width:${c.avg}%"></div></div></div>
+      </div>
+    </div>`;
+
+  // Render tree
+  renderCourseTree(c);
+  showPage('course-editor');
+}
+
+function renderCourseTree(c) {
+  const treeEl = document.getElementById('course-tree');
+  if (!treeEl) return;
+  if (!c.mods || !c.mods.length) {
+    treeEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text3);font-size:13px">Ще немає модулів. Додай перший модуль.</div>';
+    return;
+  }
+  treeEl.innerHTML = c.mods.map((m, mi) => `
+    <div class="tree-module">
+      <div class="tree-module-header" onclick="this.querySelector('.tree-module-arrow').classList.toggle('open');this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
+        <span class="drag-handle">⠿</span>
+        <span class="tree-module-arrow open">›</span>
+        <span class="tree-module-name">${m.title}</span>
+        <span class="tree-module-meta">${m.lessons.length} уроків</span>
+        <div class="tree-module-actions">
+          <button class="act-btn act-btn-blue" onclick="event.stopPropagation();document.getElementById('lesson-modal-title').textContent='Додати урок до: ${m.title.slice(0,30)}...';openModal('modal-add-lesson')" style="font-size:10.5px">+ Урок</button>
+          <button class="act-btn act-btn-red" onclick="event.stopPropagation();if(confirm('Видалити модуль?')){c.mods.splice(${mi},1);renderCourseTree(c)}" style="font-size:10.5px">✕</button>
+        </div>
+      </div>
+      <div class="tree-lessons">
+        ${m.lessons.map((l, li) => `
+          <div class="tree-lesson">
+            <span class="drag-handle">⠿</span>
+            <span class="tree-lesson-icon">${l.free?'▶️':'🔒'}</span>
+            <span class="tree-lesson-name">${l.title}</span>
+            ${l.free?'<span class="free-tag">БЕЗКОШТОВНО</span>':''}
+            <span class="tree-lesson-dur">${l.dur}</span>
+            <button class="act-btn act-btn-blue" onclick="openModal('modal-add-lesson')" style="font-size:10px;padding:3px 8px">Ред.</button>
+            <button class="act-btn act-btn-red" onclick="c.mods[${mi}].lessons.splice(${li},1);renderCourseTree(c)" style="font-size:10px;padding:3px 8px">✕</button>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+// ══ MODAL ACTIONS ══
+function createUser() {
+  closeModal('modal-create-user');
+  alert('✓ Користувача створено успішно');
+}
+
+function createCourse() {
+  const name = document.getElementById('new-course-name').value || 'Новий курс';
+  closeModal('modal-create-course');
+  const newC = {id:COURSES_DATA.length+1,title:name,emoji:'📚',modules:0,lessons:0,students:0,revenue:'₴0',status:'draft',avg:0,done:0,rating:0,mods:[]};
+  COURSES_DATA.push(newC);
+  renderCourses();
+  openCourseEditor(newC.id);
+}
+
+function addModule() {
+  closeModal('modal-add-module');
+  const c = COURSES_DATA.find(c=>c.id===activeCourseId);
+  if (!c) return;
+  if (!c.mods) c.mods = [];
+  c.mods.push({title:`Модуль ${c.mods.length+1}. Новий модуль`,lessons:[]});
+  c.modules = c.mods.length;
+  renderCourseTree(c);
+}
+
+function addLesson() {
+  closeModal('modal-add-lesson');
+  alert('✓ Урок додано до модуля');
+}
+
+// ══ ANALYTICS ══
+function renderAnalyticsCourses() {
+  document.getElementById('analytics-courses-table').innerHTML = COURSES_DATA.filter(c=>c.status==='pub').map(c=>`<tr>
+    <td><div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px">${c.emoji}</span><span style="font-weight:600;font-size:13px">${c.title}</span></div></td>
+    <td style="font-family:var(--mono);font-size:12.5px">${c.students}</td>
+    <td>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="prog-bar" style="width:80px;display:inline-block"><div class="prog-fill" style="width:${c.avg}%"></div></div>
+        <span style="font-family:var(--mono);font-size:11.5px;color:var(--accent);font-weight:600">${c.avg}%</span>
+      </div>
+    </td>
+    <td style="font-family:var(--mono);font-size:12.5px">${c.done} <span style="color:var(--text3);font-size:11px">(${c.students>0?Math.round(c.done/c.students*100):0}%)</span></td>
+    <td style="font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--green)">${c.revenue}</td>
+    <td style="font-family:var(--mono);font-size:12.5px">${c.rating>0?'⭐ '+c.rating:'—'}</td>
+  </tr>`).join('');
+}
+
+function setAnPeriod(period, btn) {
+  document.querySelectorAll('#apage-analytics .act-btn').forEach(b=>b.style.background='');
+  if (btn) btn.style.background='var(--accent-s)';
+  const data = {
+    '7d': {u:'18',r:'₴9,820',s:'8',c:'3.2%'},
+    '30d': {u:'62',r:'₴42,380',s:'34',c:'2.8%'},
+    'all': {u:'247',r:'₴342,970',s:'263',c:'2.4%'},
+  };
+  const d = data[period];
+  document.getElementById('an-users').textContent=d.u;
+  document.getElementById('an-rev').textContent=d.r;
+  document.getElementById('an-sales').textContent=d.s;
+  document.getElementById('an-conv').textContent=d.c;
+}
+
+// ══ SALES ══
+function renderSales() {
+  document.getElementById('sales-table').innerHTML = SALES.map(s=>`<tr>
+    <td style="font-family:var(--mono);font-size:12px;color:var(--text3)">${s.date}</td>
+    <td style="font-size:13px;font-weight:500">${s.user}</td>
+    <td style="font-size:12.5px;color:var(--text2)">${s.course}</td>
+    <td style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--green)">${s.sum}</td>
+    <td><span class="status status-active">● Оплачено</span></td>
+  </tr>`).join('');
+}
+
+// ══ POPULATE ADD COURSES LIST ══
+function populateAddCoursesList() {
+  document.getElementById('add-courses-list').innerHTML = COURSES_DATA.map(c=>`
+    <label style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:#fafbfc;border:1px solid var(--border);border-radius:8px;cursor:pointer">
+      <input type="checkbox" style="accent-color:var(--accent)">
+      <span style="font-size:13px">${c.emoji} ${c.title}</span>
+    </label>`).join('');
+}
+</script>
+</body>
+</html>
