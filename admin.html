@@ -526,6 +526,7 @@ function doLogin() {
   const p = document.getElementById('login-pass').value.trim();
   const err = document.getElementById('login-error');
   if (u === 'admin' && p === 'admin123') {
+    sessionStorage.setItem('admin_logged_in', 'true');
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('sidebar').style.display = 'flex';
     document.getElementById('main-content').style.display = 'block';
@@ -535,10 +536,17 @@ function doLogin() {
     setTimeout(() => err.style.display = 'none', 2500);
   }
 }
+  if (sessionStorage.getItem('admin_logged_in') === 'true') {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('sidebar').style.display = 'flex';
+  document.getElementById('main-content').style.display = 'block';
+  initAdmin();
+}
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && document.getElementById('login-screen').style.display !== 'none') doLogin();
 });
 function doLogout() {
+  sessionStorage.removeItem('admin_logged_in');
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('sidebar').style.display = 'none';
   document.getElementById('main-content').style.display = 'none';
