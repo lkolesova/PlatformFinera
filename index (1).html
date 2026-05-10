@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Капітал — інвестуй і навчайся</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --text:#1a1530;--text2:#4a4068;--text3:#9088aa;
+  --accent:#7c5ce8;--accent2:#e85c9a;
+  --green:#2ebc7a;--blue:#5b8dee;
+  --sans:'Montserrat',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-family:var(--sans);font-size:15px;color:var(--text);scroll-behavior:smooth}
+body{background:#f8f6ff;overflow-x:hidden}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;padding:0 6vw;height:60px;
+  background:rgba(248,246,255,0.82);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(124,92,232,0.1);
+}
+.nav-logo{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;color:var(--text);letter-spacing:-.5px;text-decoration:none}
+.nav-logo-mark{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 3px 12px rgba(124,92,232,0.32)}
+nav .spacer{flex:1}
+.nav-links{display:flex;gap:28px;font-size:13.5px;font-weight:500;color:var(--text2)}
+.nav-links a{text-decoration:none;color:inherit;transition:color .15s}
+.nav-links a:hover{color:var(--accent)}
+.nav-cta{margin-left:24px;padding:8px 20px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:10px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 3px 12px rgba(124,92,232,0.28);transition:all .18s}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(124,92,232,0.4)}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;display:flex;align-items:center;padding:80px 6vw 60px;
+  background:#f0ebff;
+  background-image:
+    radial-gradient(ellipse 900px 700px at 80% 50%,rgba(180,150,255,0.28) 0%,transparent 65%),
+    radial-gradient(ellipse 600px 500px at 10% 80%,rgba(255,140,200,0.18) 0%,transparent 60%),
+    radial-gradient(ellipse 500px 400px at 50% 10%,rgba(200,220,255,0.22) 0%,transparent 55%);
+  position:relative;overflow:hidden;
+}
+.hero-left{flex:1;max-width:560px;z-index:2;position:relative}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;background:rgba(124,92,232,0.1);border:1px solid rgba(124,92,232,0.2);border-radius:20px;font-size:12px;font-weight:600;color:var(--accent);margin-bottom:24px;letter-spacing:.04em}
+.hero-title{font-size:clamp(36px,5vw,58px);font-weight:800;line-height:1.1;letter-spacing:-1.5px;margin-bottom:20px}
+.hero-title span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:17px;color:var(--text2);line-height:1.7;margin-bottom:36px;max-width:440px}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap}
+.btn-primary{padding:14px 28px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:14px;font-family:var(--sans);font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 5px 20px rgba(124,92,232,0.32);transition:all .18s;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(124,92,232,0.42)}
+.btn-secondary{padding:14px 28px;background:rgba(255,255,255,0.7);border:1.5px solid rgba(124,92,232,0.25);color:var(--accent);border-radius:14px;font-family:var(--sans);font-size:14px;font-weight:700;cursor:pointer;transition:all .18s;text-decoration:none;display:inline-flex;align-items:center;gap:8px;backdrop-filter:blur(8px)}
+.btn-secondary:hover{background:rgba(255,255,255,0.9);border-color:rgba(124,92,232,0.45)}
+.hero-stats{display:flex;gap:28px;margin-top:44px;flex-wrap:wrap}
+.hstat{text-align:center}
+.hstat-num{font-size:26px;font-weight:800;letter-spacing:-.5px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hstat-label{font-size:11.5px;color:var(--text3);font-weight:500;margin-top:2px}
+
+.hero-right{flex:1;display:flex;justify-content:center;align-items:center;position:relative;z-index:2;padding-left:40px}
+.hero-mockup{
+  width:100%;max-width:580px;
+  background:rgba(255,255,255,0.62);border:1px solid rgba(255,255,255,0.85);
+  border-radius:20px;box-shadow:0 24px 80px rgba(124,92,232,0.18),0 4px 16px rgba(124,92,232,0.1);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  overflow:hidden;
+}
+.hm-bar{background:rgba(240,235,255,0.8);padding:10px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(124,92,232,0.08)}
+.hm-dots{display:flex;gap:5px}
+.hm-dot{width:10px;height:10px;border-radius:50%}
+.hm-url{flex:1;background:rgba(255,255,255,0.6);border-radius:6px;padding:4px 12px;font-size:11px;color:var(--text3);font-family:var(--mono);margin:0 12px}
+.hm-body{padding:20px}
+.hm-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.hm-card{background:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.9);border-radius:12px;padding:14px;box-shadow:0 2px 10px rgba(124,92,232,0.07)}
+.hm-card-label{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);font-weight:600;margin-bottom:6px}
+.hm-card-val{font-size:20px;font-weight:700;letter-spacing:-.5px}
+.hm-chart{background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.85);border-radius:12px;padding:14px;height:90px;position:relative;overflow:hidden}
+.hm-chart-label{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);font-weight:600;margin-bottom:8px}
+.hm-bars{display:flex;align-items:flex-end;gap:4px;height:52px}
+.hm-bar-item{flex:1;border-radius:3px 3px 0 0;transition:all .3s}
+.hm-tickers{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.hm-ticker{padding:3px 10px;background:rgba(124,92,232,0.08);border:1px solid rgba(124,92,232,0.15);border-radius:20px;font-size:10px;font-weight:600;color:var(--accent);font-family:var(--mono)}
+
+/* ── SECTIONS COMMON ── */
+section{padding:80px 6vw}
+.section-eyebrow{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.section-title{font-size:clamp(26px,3.5vw,38px);font-weight:800;letter-spacing:-.8px;line-height:1.15;margin-bottom:16px}
+.section-sub{font-size:15px;color:var(--text2);line-height:1.7;max-width:560px}
+
+/* ── FEATURES ── */
+.features-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:48px}
+.feature-block{
+  background:rgba(255,255,255,0.62);border:1px solid rgba(255,255,255,0.85);
+  border-radius:22px;padding:32px;
+  box-shadow:0 4px 24px rgba(124,92,232,0.07);
+}
+.fb-header{display:flex;align-items:center;gap:14px;margin-bottom:24px}
+.fb-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.fb-title{font-size:19px;font-weight:800;letter-spacing:-.3px}
+.fb-sub{font-size:13px;color:var(--text3);margin-top:2px;font-weight:500}
+.feature-items{display:flex;flex-direction:column;gap:14px}
+.fi{display:flex;align-items:flex-start;gap:12px}
+.fi-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.fi-text{flex:1}
+.fi-title{font-size:13.5px;font-weight:700;margin-bottom:2px}
+.fi-sub{font-size:12px;color:var(--text3);line-height:1.5}
+
+/* ── HOW ── */
+.how{background:linear-gradient(135deg,rgba(124,92,232,0.06),rgba(232,92,154,0.04))}
+.stepper{display:flex;gap:0;margin-top:52px;position:relative}
+.stepper::before{content:'';position:absolute;top:28px;left:28px;right:28px;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));z-index:0;opacity:.2}
+.step{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 16px;position:relative;z-index:1}
+.step-num{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:20px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-bottom:16px;box-shadow:0 4px 16px rgba(124,92,232,0.3)}
+.step-icon{font-size:22px;margin-bottom:8px}
+.step-title{font-size:14.5px;font-weight:700;margin-bottom:6px;letter-spacing:-.2px}
+.step-sub{font-size:12.5px;color:var(--text3);line-height:1.55}
+
+/* ── COURSES ── */
+.courses-preview{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:44px}
+.cp-card{
+  background:rgba(255,255,255,0.65);border:1px solid rgba(255,255,255,0.88);
+  border-radius:18px;overflow:hidden;
+  box-shadow:0 4px 20px rgba(124,92,232,0.08);
+  transition:all .2s;cursor:pointer;text-decoration:none;color:inherit;display:block;
+}
+.cp-card:hover{transform:translateY(-4px);box-shadow:0 12px 36px rgba(124,92,232,0.16)}
+.cp-cover{height:140px;display:flex;align-items:center;justify-content:center;font-size:48px;position:relative}
+.cp-tag{position:absolute;top:10px;left:10px;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;backdrop-filter:blur(6px)}
+.cp-body{padding:18px}
+.cp-title{font-size:14px;font-weight:700;margin-bottom:6px;line-height:1.3}
+.cp-meta{display:flex;gap:10px;font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:12px}
+.cp-price{font-size:17px;font-weight:800;color:var(--text)}
+.cp-price-old{font-size:11px;color:var(--text3);text-decoration:line-through;margin-left:6px}
+.courses-cta{text-align:center;margin-top:36px}
+
+/* ── PORTFOLIO SECTION ── */
+.portfolio-section{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.portfolio-features{display:flex;flex-direction:column;gap:20px;margin-top:28px}
+.pf-item{display:flex;gap:14px;align-items:flex-start}
+.pf-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.pf-title{font-size:14px;font-weight:700;margin-bottom:3px}
+.pf-sub{font-size:12.5px;color:var(--text3);line-height:1.55}
+
+.portfolio-mockup{
+  background:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.85);
+  border-radius:20px;padding:22px;
+  box-shadow:0 16px 60px rgba(124,92,232,0.14);
+}
+.pm-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.pm-title{font-size:13px;font-weight:700}
+.pm-badge{font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;background:rgba(46,188,122,0.12);color:#2ebc7a;font-family:var(--mono)}
+.pm-stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.pm-stat{background:rgba(255,255,255,0.7);border-radius:10px;padding:10px 12px;border:1px solid rgba(255,255,255,0.9)}
+.pm-stat-label{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);font-weight:600;margin-bottom:4px}
+.pm-stat-val{font-size:16px;font-weight:700;letter-spacing:-.3px}
+.pm-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(124,92,232,0.06)}
+.pm-row:last-child{border-bottom:none}
+.pm-ticker{font-family:var(--mono);font-size:11.5px;font-weight:600;width:50px}
+.pm-bar-wrap{flex:1;height:5px;background:rgba(124,92,232,0.08);border-radius:3px;overflow:hidden}
+.pm-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.pm-pct{font-family:var(--mono);font-size:11px;color:var(--text3);width:36px;text-align:right}
+.pm-chg{font-family:var(--mono);font-size:11px;font-weight:600;width:52px;text-align:right}
+
+/* ── CTA SECTION ── */
+.cta-section{
+  text-align:center;padding:100px 6vw;
+  background:linear-gradient(135deg,rgba(124,92,232,0.1),rgba(232,92,154,0.07));
+  position:relative;overflow:hidden;
+}
+.cta-section::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 700px 500px at 50% 50%,rgba(124,92,232,0.12) 0%,transparent 70%);
+}
+.cta-inner{position:relative;z-index:1}
+.cta-emoji{font-size:52px;margin-bottom:20px;display:block}
+.cta-title{font-size:clamp(30px,4vw,46px);font-weight:800;letter-spacing:-1px;margin-bottom:14px}
+.cta-title span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cta-sub{font-size:16px;color:var(--text2);margin-bottom:36px;line-height:1.65}
+.tg-btn{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:16px 36px;background:#0088cc;color:#fff;
+  border:none;border-radius:16px;font-family:var(--sans);font-size:15px;font-weight:700;
+  cursor:pointer;box-shadow:0 6px 24px rgba(0,136,204,0.32);transition:all .18s;text-decoration:none;
+}
+.tg-btn:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(0,136,204,0.44)}
+.tg-icon{width:24px;height:24px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.cta-note{font-size:12px;color:var(--text3);margin-top:16px}
+
+/* ── FOOTER ── */
+footer{
+  background:rgba(248,246,255,0.95);border-top:1px solid rgba(124,92,232,0.1);
+  padding:32px 6vw;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;
+}
+.footer-logo{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:800;color:var(--text);text-decoration:none}
+.footer-logo-mark{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:12px}
+.footer-links{display:flex;gap:24px;font-size:12.5px;color:var(--text3)}
+.footer-links a{text-decoration:none;color:inherit;transition:color .15s}
+.footer-links a:hover{color:var(--accent)}
+.footer-copy{font-size:12px;color:var(--text3)}
+
+/* ── ANIMATE ── */
+@keyframes floatUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.animate{animation:floatUp .6s ease both}
+.d1{animation-delay:.1s}.d2{animation-delay:.2s}.d3{animation-delay:.3s}.d4{animation-delay:.4s}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .hero{flex-direction:column;text-align:center;padding-top:90px}
+  .hero-right{padding-left:0;padding-top:40px;width:100%}
+  .hero-stats{justify-content:center}
+  .hero-btns{justify-content:center}
+  .features-grid{grid-template-columns:1fr}
+  .stepper{flex-direction:column;gap:28px}
+  .stepper::before{display:none}
+  .courses-preview{grid-template-columns:1fr 1fr}
+  .portfolio-section{grid-template-columns:1fr}
+  .portfolio-mockup{display:none}
+}
+@media(max-width:600px){
+  .courses-preview{grid-template-columns:1fr}
+  .nav-links{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="nav-logo-mark">◈</div>
+    Капітал
+  </a>
+  <div class="spacer"></div>
+  <div class="nav-links">
+    <a href="#features">Можливості</a>
+    <a href="#how">Як почати</a>
+    <a href="#courses">Курси</a>
+    <a href="#portfolio">Портфель</a>
+  </div>
+  <button class="nav-cta" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})">Почати безкоштовно</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero" style="display:flex;gap:40px">
+  <div class="hero-left">
+    <div class="hero-eyebrow animate d1">🇺🇦 Для українських інвесторів</div>
+    <h1 class="hero-title animate d2">Інвестуй впевнено.<br><span>Навчайся і аналізуй</span><br>в одному місці.</h1>
+    <p class="hero-sub animate d3">Платформа для тих, хто хоче розібратися в інвестиціях і вести свій портфель без зайвого клопоту. Навчальні курси + AI-аналітика портфеля.</p>
+    <div class="hero-btns animate d4">
+      <a href="learning.html" class="btn-primary">🎓 Почати навчання</a>
+      <a href="investment_dashboard.html" class="btn-secondary">📊 Подивитись портфель</a>
+    </div>
+    <div class="hero-stats animate d4">
+      <div class="hstat"><div class="hstat-num">8+</div><div class="hstat-label">курсів</div></div>
+      <div class="hstat" style="border-left:1px solid rgba(124,92,232,0.15);padding-left:28px"><div class="hstat-num">AI</div><div class="hstat-label">аналіз компаній</div></div>
+      <div class="hstat" style="border-left:1px solid rgba(124,92,232,0.15);padding-left:28px"><div class="hstat-num">Freedom</div><div class="hstat-label">& IBKR вигрузки</div></div>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="hero-mockup animate d3">
+      <div class="hm-bar">
+        <div class="hm-dots">
+          <div class="hm-dot" style="background:#ff5f57"></div>
+          <div class="hm-dot" style="background:#febc2e"></div>
+          <div class="hm-dot" style="background:#28c840"></div>
+        </div>
+        <div class="hm-url">капітал.ua · Мій портфель</div>
+      </div>
+      <div class="hm-body">
+        <div class="hm-cards">
+          <div class="hm-card">
+            <div class="hm-card-label">Інвестовано</div>
+            <div class="hm-card-val">$14,280</div>
+            <div style="font-size:11px;color:#2ebc7a;margin-top:3px;font-weight:500">↑ +12.4% цього року</div>
+          </div>
+          <div class="hm-card">
+            <div class="hm-card-label">Дивіденди</div>
+            <div class="hm-card-val" style="color:#2ebc7a">$318.40</div>
+            <div style="font-size:11px;color:#9088aa;margin-top:3px">за 2025 рік</div>
+          </div>
+        </div>
+        <div class="hm-chart">
+          <div class="hm-chart-label">Розподіл по секторах</div>
+          <div class="hm-bars">
+            <div class="hm-bar-item" style="height:75%;background:linear-gradient(180deg,#5b8dee,#8db5f5)"></div>
+            <div class="hm-bar-item" style="height:60%;background:linear-gradient(180deg,#2ebc7a,#60d9a4)"></div>
+            <div class="hm-bar-item" style="height:85%;background:linear-gradient(180deg,#7c5ce8,#a78bfa)"></div>
+            <div class="hm-bar-item" style="height:45%;background:linear-gradient(180deg,#fbbf24,#fcd97e)"></div>
+            <div class="hm-bar-item" style="height:35%;background:linear-gradient(180deg,#e85c9a,#f087b8)"></div>
+            <div class="hm-bar-item" style="height:25%;background:linear-gradient(180deg,#f87171,#fca5a5)"></div>
+            <div class="hm-bar-item" style="height:18%;background:linear-gradient(180deg,#94a3b8,#cbd5e1)"></div>
+          </div>
+        </div>
+        <div class="hm-tickers">
+          <span class="hm-ticker">AAPL</span>
+          <span class="hm-ticker">MSFT</span>
+          <span class="hm-ticker">VOO</span>
+          <span class="hm-ticker">JNJ</span>
+          <span class="hm-ticker">BRK.B</span>
+          <span class="hm-ticker">GLD</span>
+          <span class="hm-ticker">+8</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" style="background:#fff">
+  <div style="text-align:center;margin-bottom:0">
+    <div class="section-eyebrow">Що є на платформі</div>
+    <h2 class="section-title" style="text-align:center">Два інструменти.<br>Одна платформа.</h2>
+  </div>
+  <div class="features-grid">
+    <!-- PORTFOLIO BLOCK -->
+    <div class="feature-block">
+      <div class="fb-header">
+        <div class="fb-icon" style="background:linear-gradient(135deg,rgba(91,141,238,0.15),rgba(124,92,232,0.12))">📊</div>
+        <div>
+          <div class="fb-title">Портфель</div>
+          <div class="fb-sub">Аналітика ваших інвестицій</div>
+        </div>
+      </div>
+      <div class="feature-items">
+        <div class="fi">
+          <div class="fi-icon" style="background:rgba(91,141,238,0.1)">📁</div>
+          <div class="fi-text">
+            <div class="fi-title">Завантаж вигрузку з брокера</div>
+            <div class="fi-sub">Підтримується Freedom Finance, Tradernet. Просто перетягни Excel-файл.</div>
+          </div>
+        </div>
+        <div class="fi">
+          <div class="fi-icon" style="background:rgba(46,188,122,0.1)">📈</div>
+          <div class="fi-text">
+            <div class="fi-title">Аналітика портфеля</div>
+            <div class="fi-sub">Розподіл по секторах, дивіденди, комісії, реалізований P&L — всі цифри в одному місці.</div>
+          </div>
+        </div>
+        <div class="fi">
+          <div class="fi-icon" style="background:rgba(124,92,232,0.1)">🤖</div>
+          <div class="fi-text">
+            <div class="fi-title">AI-аналіз компанії</div>
+            <div class="fi-sub">Введи тікер — отримай фундаментальний розбір, цільову ціну та висновок.</div>
+          </div>
+        </div>
+        <div class="fi">
+          <div class="fi-icon" style="background:rgba(232,92,154,0.1)">🔗</div>
+          <div class="fi-text">
+            <div class="fi-title">Схожі компанії</div>
+            <div class="fi-sub">AI знаходить аналоги з подібними фінансовими показниками для нових ідей.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LEARNING BLOCK -->
+    <div class="feature-block" style="background:linear-gradient(135deg,rgba(124,92,232,0.06),rgba(232,92,154,0.04))">
+      <div class="fb-header">
+        <div class="fb-icon" style="background:linear-gradient(135deg,rgba(124,92,232,0.18),rgba(232,92,154,0.12))">🎓</div>
+        <div>
+          <div class="fb-title">Навчання</div>
+          <div class="fb-sub">Курси від практиків ринку</div>
+        </div>
+      </div>
+      <div class="feature-items">
+        <div class="fi">
+          <div class="fi-icon" style="background:rgba(124,92,232,0.12)">📚</div>
+          <div class="fi-text">
+            <div class="fi-title">Курси з нуля до просунутого</div>
+            <div class="fi-sub">Основи інвестування, дивідендні стратегії, фундаментальний аналіз, ETF.</div>
+          </div>
+        </div>
+        <div class="fi">
+          <div class="fi-icon" style="background:rgba(232,92,154,0.1)">▶️</div>
+          <div class="fi-text">
+            <div class="fi-title">Відеоуроки з конспектами</div>
+            <div class="fi-sub">До кожного уроку — нотатки і матеріали для скачування. Перший урок безкоштовно.</div>
+          </div>
+        </div>
+        <div class="fi">
+          <div class="fi-icon" style="background:rgba(46,188,122,0.1)">✅</div>
+          <div class="fi-text">
+            <div class="fi-title">Прогрес і сертифікати</div>
+            <div class="fi-sub">Відслідковуй пройдені уроки. Після завершення курсу — сертифікат.</div>
+          </div>
+        </div>
+        <div class="fi">
+          <div class="fi-icon" style="background:rgba(251,191,36,0.12)">💬</div>
+          <div class="fi-text">
+            <div class="fi-title">Практика одразу</div>
+            <div class="fi-sub">Паралельно з навчанням аналізуй реальний портфель у дашборді.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW TO START -->
+<section id="how" class="how">
+  <div style="text-align:center">
+    <div class="section-eyebrow">Як почати</div>
+    <h2 class="section-title" style="text-align:center">Три хвилини — і ти всередині</h2>
+  </div>
+  <div class="stepper">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-icon">💬</div>
+      <div class="step-title">Увійди через Telegram</div>
+      <div class="step-sub">Натисни кнопку "Почати". Авторизація через Telegram — без паролів і форм.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-icon">🎯</div>
+      <div class="step-title">Обери напрямок</div>
+      <div class="step-sub">Хочеш навчатись — іди в каталог курсів. Маєш портфель — іди в дашборд.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-icon">📂</div>
+      <div class="step-title">Завантаж або обери курс</div>
+      <div class="step-sub">Для портфеля: завантаж Excel з Freedom Finance. Для навчання: купи курс і почни з першого уроку.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-icon">🚀</div>
+      <div class="step-title">Аналізуй і навчайся</div>
+      <div class="step-sub">Переглядай аналітику, питай AI про компанії, проходь уроки — все в одному місці.</div>
+    </div>
+  </div>
+</section>
+
+<!-- COURSES PREVIEW -->
+<section id="courses" style="background:#fff">
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px">
+    <div>
+      <div class="section-eyebrow">Навчання</div>
+      <h2 class="section-title" style="margin-bottom:6px">Курси від практиків</h2>
+      <p class="section-sub">Без зайвої теорії — тільки те що реально потрібно інвестору.</p>
+    </div>
+    <a href="learning.html" class="btn-secondary" style="flex-shrink:0">Переглянути всі курси →</a>
+  </div>
+  <div class="courses-preview">
+    <a href="learning.html" class="cp-card">
+      <div class="cp-cover" style="background:linear-gradient(135deg,#6fa0f5,#a78bfa)">
+        📈
+        <div class="cp-tag" style="background:rgba(232,92,154,0.85);color:#fff">🔥 Хіт</div>
+      </div>
+      <div class="cp-body">
+        <div class="cp-title">Інвестиції з нуля</div>
+        <div class="cp-meta"><span>📚 24 уроки</span><span>⏱ 6 год</span><span>🎯 Початківець</span></div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:12px;line-height:1.5">Від першого долара до власного портфеля. Для тих хто хоче почати але не знає з чого.</div>
+        <div><span class="cp-price">1 290 ₴</span><span class="cp-price-old">1 890 ₴</span></div>
+      </div>
+    </a>
+    <a href="learning.html" class="cp-card">
+      <div class="cp-cover" style="background:linear-gradient(135deg,#2ebc7a,#6fa0f5)">
+        💰
+        <div class="cp-tag" style="background:rgba(46,188,122,0.9);color:#fff">Новий</div>
+      </div>
+      <div class="cp-body">
+        <div class="cp-title">Дивідендний портфель</div>
+        <div class="cp-meta"><span>📚 18 уроків</span><span>⏱ 4.5 год</span><span>🎯 Середній</span></div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:12px;line-height:1.5">REIT, дивідендні акції, пасивний дохід — стратегія що платить щомісяця.</div>
+        <div><span class="cp-price">1 590 ₴</span></div>
+      </div>
+    </a>
+    <a href="learning.html" class="cp-card">
+      <div class="cp-cover" style="background:linear-gradient(135deg,#f5a06f,#e85c9a)">
+        🔬
+      </div>
+      <div class="cp-body">
+        <div class="cp-title">Фундаментальний аналіз</div>
+        <div class="cp-meta"><span>📚 32 уроки</span><span>⏱ 9 год</span><span>🎯 Просунутий</span></div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:12px;line-height:1.5">Читай звітність, рахуй мультиплікатори, знаходь недооцінені компанії.</div>
+        <div><span class="cp-price">1 990 ₴</span><span class="cp-price-old">2 490 ₴</span></div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- PORTFOLIO SECTION -->
+<section id="portfolio" style="background:linear-gradient(135deg,rgba(91,141,238,0.05),rgba(124,92,232,0.04))">
+  <div class="portfolio-section">
+    <div>
+      <div class="section-eyebrow">Портфель</div>
+      <h2 class="section-title">Твій брокерський звіт — в зручному вигляді</h2>
+      <p class="section-sub">Завантаж Excel-вигрузку з Freedom Finance і одразу бачиш повну аналітику.</p>
+      <div class="portfolio-features">
+        <div class="pf-item">
+          <div class="pf-icon" style="background:rgba(91,141,238,0.12)">📊</div>
+          <div>
+            <div class="pf-title">Розподіл по секторах і тікерах</div>
+            <div class="pf-sub">Трімап і кругова діаграма — одразу видно де концентрація ризику.</div>
+          </div>
+        </div>
+        <div class="pf-item">
+          <div class="pf-icon" style="background:rgba(46,188,122,0.12)">💵</div>
+          <div>
+            <div class="pf-title">Дивіденди з деталями</div>
+            <div class="pf-sub">Брутто, податок, чисто — по кожній компанії і за будь-який період.</div>
+          </div>
+        </div>
+        <div class="pf-item">
+          <div class="pf-icon" style="background:rgba(124,92,232,0.12)">🤖</div>
+          <div>
+            <div class="pf-title">AI-аналіз будь-якої акції</div>
+            <div class="pf-sub">Введи тікер — отримай P/E, цільову ціну, ризики і висновок за 10 секунд.</div>
+          </div>
+        </div>
+        <div class="pf-item">
+          <div class="pf-icon" style="background:rgba(232,92,154,0.12)">🔍</div>
+          <div>
+            <div class="pf-title">Фільтр за часом</div>
+            <div class="pf-sub">Цей місяць, квартал, рік, або будь-який власний проміжок.</div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:28px">
+        <a href="investment_dashboard.html" class="btn-primary">Відкрити дашборд →</a>
+      </div>
+    </div>
+
+    <div class="portfolio-mockup">
+      <div class="pm-header">
+        <div class="pm-title">Портфель Марії</div>
+        <div class="pm-badge">● Interactive Brokers</div>
+      </div>
+      <div class="pm-stat-row">
+        <div class="pm-stat">
+          <div class="pm-stat-label">Вартість</div>
+          <div class="pm-stat-val">$14,280</div>
+        </div>
+        <div class="pm-stat">
+          <div class="pm-stat-label">Дивіденди</div>
+          <div class="pm-stat-val" style="color:#2ebc7a">$318.40</div>
+        </div>
+        <div class="pm-stat">
+          <div class="pm-stat-label">P&L</div>
+          <div class="pm-stat-val" style="color:#2ebc7a">+$1,760</div>
+        </div>
+      </div>
+      <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);font-weight:600;margin-bottom:8px">Позиції</div>
+      <div class="pm-row">
+        <div class="pm-ticker">AAPL</div>
+        <div class="pm-bar-wrap"><div class="pm-bar-fill" style="width:85%"></div></div>
+        <div class="pm-pct">28.4%</div>
+        <div class="pm-chg" style="color:#2ebc7a">+14.2%</div>
+      </div>
+      <div class="pm-row">
+        <div class="pm-ticker">MSFT</div>
+        <div class="pm-bar-wrap"><div class="pm-bar-fill" style="width:68%"></div></div>
+        <div class="pm-pct">22.6%</div>
+        <div class="pm-chg" style="color:#2ebc7a">+9.8%</div>
+      </div>
+      <div class="pm-row">
+        <div class="pm-ticker">VOO</div>
+        <div class="pm-bar-wrap"><div class="pm-bar-fill" style="width:52%"></div></div>
+        <div class="pm-pct">17.3%</div>
+        <div class="pm-chg" style="color:#2ebc7a">+6.1%</div>
+      </div>
+      <div class="pm-row">
+        <div class="pm-ticker">JNJ</div>
+        <div class="pm-bar-wrap"><div class="pm-bar-fill" style="width:38%"></div></div>
+        <div class="pm-pct">12.7%</div>
+        <div class="pm-chg" style="color:#e05a6a">-1.4%</div>
+      </div>
+      <div class="pm-row">
+        <div class="pm-ticker">GLD</div>
+        <div class="pm-bar-wrap"><div class="pm-bar-fill" style="width:28%"></div></div>
+        <div class="pm-pct">9.2%</div>
+        <div class="pm-chg" style="color:#2ebc7a">+11.3%</div>
+      </div>
+      <div style="text-align:center;margin-top:12px;font-size:11.5px;color:var(--accent);font-weight:600;cursor:pointer">+ ще 9 позицій</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta" class="cta-section">
+  <div class="cta-inner">
+    <span class="cta-emoji">🚀</span>
+    <h2 class="cta-title">Готова <span>почати</span>?</h2>
+    <p class="cta-sub">Приєднуйся до платформи — навчайся, аналізуй портфель і інвестуй впевнено.<br>Перший урок і демо-дашборд — безкоштовно.</p>
+    <a href="#" class="tg-btn">
+      <div class="tg-icon">✈️</div>
+      Увійти через Telegram
+    </a>
+    <div class="cta-note">Або <a href="learning.html" style="color:var(--accent);text-decoration:none;font-weight:600">переглянь каталог курсів</a> спочатку</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a class="footer-logo" href="#">
+    <div class="footer-logo-mark">◈</div>
+    Капітал
+  </a>
+  <div class="footer-links">
+    <a href="learning.html">Курси</a>
+    <a href="investment_dashboard.html">Портфель</a>
+    <a href="#">Підтримка</a>
+    <a href="#">Telegram</a>
+  </div>
+  <div class="footer-copy">© 2025 Капітал. Все права захищені.</div>
+</footer>
+
+<script>
+// Scroll animations
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.opacity = '1';
+      e.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.feature-block, .step, .cp-card, .pf-item').forEach(el => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(20px)';
+  el.style.transition = 'opacity .5s ease, transform .5s ease';
+  obs.observe(el);
+});
+
+// Add stagger to steps
+document.querySelectorAll('.step').forEach((el, i) => {
+  el.style.transitionDelay = (i * 0.1) + 's';
+});
+document.querySelectorAll('.cp-card').forEach((el, i) => {
+  el.style.transitionDelay = (i * 0.08) + 's';
+});
+</script>
+</body>
+</html>
