@@ -1,0 +1,2353 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Капітал · Інвест-аналітик</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --glass: rgba(255,255,255,0.52);
+  --glass-border: rgba(255,255,255,0.75);
+  --shadow-card: 0 4px 24px rgba(100,120,160,0.10), 0 1px 3px rgba(100,120,160,0.06);
+  --text: #1a1f2e; --text2: #4a5568; --text3: #8896aa;
+  --accent: #5b8dee; --accent-soft: rgba(91,141,238,0.12);
+  --green: #2e9e6e; --green-soft: rgba(46,158,110,0.12);
+  --red: #d0526a; --red-soft: rgba(208,82,106,0.12);
+  --amber: #c47d22; --amber-soft: rgba(196,125,34,0.12);
+  --purple: #7060d8; --purple-soft: rgba(112,96,216,0.12);
+  --mono: 'JetBrains Mono', monospace; --sans: 'Montserrat', sans-serif;
+  --r-sm: 12px; --r-md: 16px; --r-lg: 22px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-family:var(--sans);font-size:14px;color:var(--text);background:#dde6f0;
+  background-image:radial-gradient(ellipse 900px 700px at 15% 10%,rgba(180,200,240,0.55) 0%,transparent 70%),
+  radial-gradient(ellipse 700px 600px at 85% 85%,rgba(200,185,240,0.35) 0%,transparent 70%),
+  radial-gradient(ellipse 600px 500px at 50% 50%,rgba(220,235,255,0.25) 0%,transparent 70%);
+  min-height:100vh;}
+body{display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:230px;flex-shrink:0;position:fixed;top:52px;height:calc(100vh - 52px);padding:20px 0;display:flex;flex-direction:column;
+  background:rgba(220,230,245,0.55);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);
+  border-right:1px solid rgba(255,255,255,0.6);box-shadow:1px 0 24px rgba(100,120,160,0.08);overflow-y:auto;}
+.logo{padding:0 22px 24px;border-bottom:1px solid rgba(255,255,255,0.5);margin-bottom:10px}
+.logo-mark{width:36px;height:36px;border-radius:10px;margin-bottom:10px;background:linear-gradient(135deg,#6fa0f5,#a78bfa);
+  display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 4px 12px rgba(91,141,238,0.28);}
+.logo-text{font-size:17px;font-weight:700;letter-spacing:-0.3px}
+.logo-sub{font-size:10px;color:var(--text3);letter-spacing:0.06em;text-transform:uppercase;margin-top:2px;font-family:var(--mono)}
+.nav-section{font-size:9.5px;letter-spacing:0.14em;color:var(--text3);padding:18px 22px 6px;text-transform:uppercase;font-weight:600}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 22px;cursor:pointer;font-size:13px;color:var(--text2);
+  transition:all .18s;margin:1px 10px;border-radius:var(--r-sm);font-weight:500;}
+.nav-item:hover{background:rgba(255,255,255,0.5);color:var(--text)}
+.nav-item.active{background:rgba(255,255,255,0.72);color:var(--accent);box-shadow:0 2px 12px rgba(91,141,238,0.14);font-weight:600}
+.nav-icon{width:16px;height:16px;flex-shrink:0;opacity:.7}
+.nav-item.active .nav-icon{opacity:1}
+.sidebar-bottom{margin-top:auto;padding:16px 10px}
+.mode-pill{display:flex;align-items:center;gap:8px;padding:8px 14px;background:rgba(255,255,255,0.4);
+  border-radius:var(--r-sm);border:1px solid rgba(255,255,255,0.6);margin-bottom:10px;
+  font-size:11.5px;color:var(--text2);cursor:pointer;transition:all .15s;}
+.mode-pill:hover{background:rgba(255,255,255,0.62)}
+.mode-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;background:var(--amber)}
+.mode-dot.live{background:var(--green)}
+.upload-btn{width:100%;padding:10px 14px;background:linear-gradient(135deg,#6fa0f5,#a78bfa);color:#fff;border:none;
+  border-radius:var(--r-sm);font-family:var(--sans);font-size:12.5px;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;
+  box-shadow:0 4px 16px rgba(91,141,238,0.28);}
+.upload-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(91,141,238,0.38)}
+
+/* MAIN */
+.main{margin-left:230px;flex:1;padding:88px 40px 36px;min-height:100vh}
+.page{display:none}.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.page.active{animation:fadeUp .2s ease}
+
+/* BANNER */
+.mode-banner{display:flex;align-items:center;gap:12px;padding:11px 16px;border-radius:var(--r-sm);
+  margin-bottom:24px;font-size:12.5px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,0.6);}
+.mode-banner.demo{background:rgba(196,125,34,0.07);border-color:rgba(196,125,34,0.22)}
+.mode-banner.live{background:rgba(46,158,110,0.07);border-color:rgba(46,158,110,0.22)}
+.banner-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.mode-banner.demo .banner-dot{background:var(--amber)}
+.mode-banner.live .banner-dot{background:var(--green)}
+.banner-text{color:var(--text2);flex:1;font-size:12px}
+.banner-btn{font-size:11.5px;font-weight:600;font-family:var(--sans);cursor:pointer;
+  padding:5px 12px;border-radius:8px;border:1px solid;transition:all .15s;background:transparent;}
+.mode-banner.demo .banner-btn{color:var(--amber);border-color:rgba(196,125,34,0.3)}
+.mode-banner.demo .banner-btn:hover{background:rgba(196,125,34,0.08)}
+.mode-banner.live .banner-btn{color:var(--green);border-color:rgba(46,158,110,0.3)}
+.mode-banner.live .banner-btn:hover{background:rgba(46,158,110,0.08)}
+
+/* PAGE HEADER */
+.page-header{margin-bottom:28px}
+.page-title{font-size:24px;font-weight:700;letter-spacing:-0.5px;margin-bottom:4px}
+.page-sub{font-size:12.5px;color:var(--text3)}
+.page-sub span{color:var(--accent);font-family:var(--mono);font-size:11.5px}
+
+/* GLASS CARD */
+.gcard{background:var(--glass);backdrop-filter:blur(20px) saturate(1.3);-webkit-backdrop-filter:blur(20px) saturate(1.3);
+  border:1px solid var(--glass-border);border-radius:var(--r-lg);box-shadow:var(--shadow-card);}
+.gcard-p{padding:22px}
+
+/* STAT ROW */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat-card{background:var(--glass);backdrop-filter:blur(20px) saturate(1.3);-webkit-backdrop-filter:blur(20px) saturate(1.3);
+  border:1px solid var(--glass-border);border-radius:var(--r-md);box-shadow:var(--shadow-card);
+  padding:18px 20px;transition:transform .18s;}
+.stat-card:hover{transform:translateY(-2px)}
+.stat-icon{width:32px;height:32px;border-radius:9px;margin-bottom:12px;display:flex;align-items:center;justify-content:center}
+.stat-label{font-size:10.5px;color:var(--text3);letter-spacing:0.05em;text-transform:uppercase;font-weight:600;margin-bottom:6px}
+.stat-val{font-size:22px;font-weight:700;letter-spacing:-0.5px}
+.stat-change{font-size:11px;margin-top:4px;font-family:var(--mono);font-weight:500}
+.pos{color:var(--green)}.neg{color:var(--red)}
+
+/* LAYOUTS */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.full-col{margin-bottom:16px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.card-title{font-size:13.5px;font-weight:700;letter-spacing:-0.1px}
+
+/* BADGE */
+.badge{font-size:10px;font-family:var(--mono);padding:3px 9px;border-radius:20px;font-weight:500;letter-spacing:0.03em}
+.b-green{background:var(--green-soft);color:var(--green)}.b-blue{background:var(--accent-soft);color:var(--accent)}
+.b-amber{background:var(--amber-soft);color:var(--amber)}.b-red{background:var(--red-soft);color:var(--red)}
+.b-purple{background:var(--purple-soft);color:var(--purple)}
+
+/* TABLE */
+.ptable{width:100%;border-collapse:collapse}
+.ptable th{font-size:10px;letter-spacing:0.1em;color:var(--text3);text-transform:uppercase;font-weight:600;
+  padding:7px 10px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.5)}
+.ptable td{padding:11px 10px;font-size:12.5px;border-bottom:1px solid rgba(255,255,255,0.3)}
+.ptable tr:last-child td{border-bottom:none}
+.ptable tr:hover td{background:rgba(255,255,255,0.25)}
+.ticker{font-family:var(--mono);font-weight:500;font-size:12px;letter-spacing:0.04em}
+.ticker-name{color:var(--text3);font-size:11px;margin-top:1px}
+.atag{display:inline-block;font-size:9.5px;padding:2px 8px;border-radius:20px;font-family:var(--mono);font-weight:500}
+.atag-etf{background:var(--accent-soft);color:var(--accent)}.atag-stock{background:var(--purple-soft);color:var(--purple)}
+.atag-fx{background:rgba(196,125,34,0.1);color:var(--amber)}
+
+/* DONUT */
+.chart-wrap{display:flex;align-items:center;gap:22px}
+.donut-labels{flex:1;display:flex;flex-direction:column;gap:7px;max-height:180px;overflow-y:auto}
+.dl-item{display:flex;align-items:center;gap:9px;font-size:11.5px}
+.dl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dl-name{color:var(--text2);flex:1;font-weight:500}
+.dl-pct{font-family:var(--mono);font-size:11px;font-weight:500}
+
+/* RISK */
+.risk-bar{height:5px;background:rgba(0,0,0,0.06);border-radius:4px;overflow:hidden;margin-top:6px}
+.risk-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#4ade80,#fbbf24,#fb923c,#f87171)}
+.sector-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.s-pill{padding:4px 11px;border-radius:20px;font-size:10.5px;font-family:var(--mono);font-weight:500;
+  background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.7);color:var(--text2)}
+
+/* AI */
+.ai-input-row{display:flex;gap:8px;margin-bottom:12px}
+.ai-input{flex:1;background:rgba(255,255,255,0.55);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,0.7);border-radius:var(--r-sm);padding:10px 15px;color:var(--text);
+  font-size:13px;font-family:var(--sans);outline:none;transition:all .18s;}
+.ai-input:focus{border-color:rgba(91,141,238,0.45);background:rgba(255,255,255,0.72);box-shadow:0 0 0 3px rgba(91,141,238,0.08)}
+.ai-input::placeholder{color:var(--text3)}
+.ai-btn{padding:10px 20px;background:linear-gradient(135deg,#6fa0f5,#a78bfa);color:#fff;border:none;
+  border-radius:var(--r-sm);font-family:var(--sans);font-weight:700;font-size:12.5px;cursor:pointer;
+  white-space:nowrap;transition:all .18s;box-shadow:0 4px 14px rgba(91,141,238,0.22);}
+.ai-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(91,141,238,0.32)}
+.ai-btn:disabled{background:rgba(150,160,180,0.28);box-shadow:none;cursor:not-allowed;color:var(--text3);transform:none}
+.ai-hint{font-size:10.5px;color:var(--text3);font-family:var(--mono);margin-bottom:16px}
+.ai-result{background:rgba(255,255,255,0.38);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,0.6);border-radius:var(--r-sm);padding:18px;font-size:13px;
+  line-height:1.75;color:var(--text2);min-height:90px;white-space:pre-wrap;}
+.ai-result.loading{position:relative;overflow:hidden}
+.ai-result.loading::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.5),transparent);animation:shimmer 1.3s infinite;}
+@keyframes shimmer{to{left:150%}}
+
+/* PEERS */
+.peers-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.peer-card{background:rgba(255,255,255,0.42);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,0.65);border-radius:var(--r-md);padding:15px;cursor:pointer;transition:all .18s;}
+.peer-card:hover{background:rgba(255,255,255,0.62);transform:translateY(-2px);box-shadow:0 6px 20px rgba(100,120,160,0.12)}
+.peer-ticker{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--accent);letter-spacing:0.04em}
+.peer-name{font-size:11px;color:var(--text3);margin:2px 0 8px;font-weight:500}
+.peer-why{font-size:11px;color:var(--text2);line-height:1.55;margin-bottom:10px}
+.peer-stats{display:flex;gap:14px}
+.peer-stat-label{font-size:9.5px;color:var(--text3);display:block;margin-bottom:2px;font-family:var(--mono);text-transform:uppercase;letter-spacing:0.05em}
+.peer-stat-val{font-size:12px;font-family:var(--mono);font-weight:500}
+
+/* BROKER SELECT */
+.broker-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.broker-card{background:rgba(255,255,255,0.42);border:1.5px solid rgba(255,255,255,0.65);border-radius:var(--r-md);
+  padding:18px;cursor:pointer;transition:all .18s;text-align:center;}
+.broker-card:hover{background:rgba(255,255,255,0.62);transform:translateY(-2px);box-shadow:0 6px 20px rgba(100,120,160,0.12)}
+.broker-card.selected{border-color:rgba(91,141,238,0.55);background:rgba(91,141,238,0.06);box-shadow:0 0 0 3px rgba(91,141,238,0.12)}
+.broker-logo{font-size:28px;margin-bottom:10px}
+.broker-name{font-size:13px;font-weight:700;margin-bottom:3px}
+.broker-desc{font-size:11px;color:var(--text3);line-height:1.5}
+.broker-files{margin-top:8px;font-size:10px;font-family:var(--mono);color:var(--accent)}
+.broker-card.soon{opacity:.45;cursor:not-allowed}
+.broker-card.soon:hover{transform:none;background:rgba(255,255,255,0.42);box-shadow:none}
+
+/* UPLOAD ZONE */
+.upload-zone{border:1.5px dashed rgba(91,141,238,0.28);border-radius:var(--r-lg);padding:32px;text-align:center;
+  cursor:pointer;transition:all .2s;background:rgba(255,255,255,0.28);display:block;margin-bottom:12px;}
+.upload-zone:hover,.upload-zone.drag{border-color:rgba(91,141,238,0.5);background:rgba(91,141,238,0.03)}
+.upload-zone.uploaded{border-color:rgba(46,158,110,0.45);background:rgba(46,158,110,0.04)}
+.upload-icon-wrap{font-size:30px;margin-bottom:10px;opacity:.5}
+.upload-zone-title{font-size:13.5px;font-weight:700;margin-bottom:4px}
+.upload-zone-sub{font-size:11.5px;color:var(--text3);line-height:1.6}
+input[type=file]{display:none}
+
+/* CHECK LIST */
+.check-list{display:flex;flex-direction:column;gap:9px}
+.check-item{display:flex;gap:10px;align-items:flex-start;font-size:12.5px;color:var(--text2);line-height:1.55}
+.check-sym{flex-shrink:0;margin-top:1px}
+.pos-row{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;
+  background:rgba(255,255,255,0.38);border:1px solid rgba(255,255,255,0.55);border-radius:var(--r-sm);transition:background .15s;}
+.pos-row:hover{background:rgba(255,255,255,0.55)}
+
+/* DIV TABLE */
+.div-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;
+  border-bottom:1px solid rgba(255,255,255,0.3);font-size:12.5px;}
+.div-row:last-child{border-bottom:none}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:44px 20px;color:var(--text3)}
+.empty-icon{font-size:34px;margin-bottom:14px;opacity:.4}
+.empty-title{font-size:15px;font-weight:700;color:var(--text2);margin-bottom:6px}
+.empty-sub{font-size:12.5px;line-height:1.65;margin-bottom:20px}
+.empty-upload-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:9px 20px;
+  background:linear-gradient(135deg,#6fa0f5,#a78bfa);
+  color:#fff;border:none;border-radius:var(--r-sm);
+  font-family:var(--sans);font-size:12.5px;font-weight:700;
+  cursor:pointer;transition:all .18s;
+  box-shadow:0 4px 14px rgba(91,141,238,0.22);
+}
+.empty-upload-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(91,141,238,0.32)}
+
+/* PROGRESS */
+.parse-progress{background:rgba(255,255,255,0.38);border:1px solid rgba(255,255,255,0.6);border-radius:var(--r-sm);padding:16px;margin-top:12px;display:none}
+.progress-bar-wrap{height:4px;background:rgba(0,0,0,0.06);border-radius:2px;overflow:hidden;margin-top:10px}
+.progress-bar-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,#6fa0f5,#a78bfa);transition:width .3s}
+
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.1);border-radius:2px}
+
+/* DONUT SVG colors */
+.donut-c{stroke-linecap:butt}
+
+/* TOOLTIP */
+.stat-card{position:relative}
+.info-btn{
+  position:absolute;top:14px;right:14px;
+  width:18px;height:18px;border-radius:50%;
+  background:rgba(136,150,170,0.15);border:1px solid rgba(136,150,170,0.25);
+  display:flex;align-items:center;justify-content:center;cursor:default;
+  font-size:10px;font-weight:700;color:var(--text3);line-height:1;
+  transition:all .15s;user-select:none;flex-shrink:0;z-index:10;
+}
+.info-btn:hover{background:rgba(91,141,238,0.15);border-color:rgba(91,141,238,0.35);color:var(--accent)}
+.tooltip-box{
+  position:fixed;z-index:9999;
+  background:rgba(26,31,46,0.95);
+  backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);
+  border:1px solid rgba(255,255,255,0.13);border-radius:12px;
+  padding:13px 15px;width:230px;
+  box-shadow:0 12px 40px rgba(0,0,0,0.28),0 2px 8px rgba(0,0,0,0.14);
+  opacity:0;pointer-events:none;
+  transition:opacity .16s,transform .16s;
+  transform:translateY(6px);
+}
+.tooltip-box.tt-visible{opacity:1;pointer-events:auto;transform:translateY(0)}
+.tooltip-arrow{
+  position:absolute;width:9px;height:9px;background:rgba(26,31,46,0.95);
+  border-left:1px solid rgba(255,255,255,0.13);border-top:1px solid rgba(255,255,255,0.13);
+  transform:rotate(45deg);top:-5px;right:14px;
+}
+.tt-title{font-size:11px;font-weight:700;color:rgba(255,255,255,0.95);margin-bottom:7px;letter-spacing:0.01em}
+.tt-row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:5px}
+.tt-row:last-child{margin-bottom:0}
+.tt-key{font-size:10.5px;color:rgba(255,255,255,0.45);flex:1;line-height:1.5}
+.tt-val{font-size:10.5px;color:rgba(255,255,255,0.85);font-family:var(--mono);text-align:right;font-weight:500}
+.tt-divider{height:1px;background:rgba(255,255,255,0.08);margin:8px 0}
+/* TOPNAV */
+.topnav{
+  position:fixed;top:0;left:0;right:0;z-index:200;height:52px;
+  background:rgba(225,232,245,0.72);
+  backdrop-filter:blur(22px) saturate(1.5);-webkit-backdrop-filter:blur(22px) saturate(1.5);
+  border-bottom:1px solid rgba(255,255,255,0.65);
+  display:flex;align-items:center;padding:0 20px;gap:8px;
+}
+.tn-logo{display:flex;align-items:center;gap:9px;margin-right:16px}
+.tn-logo-mark{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#6fa0f5,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:13px;box-shadow:0 3px 10px rgba(91,141,238,0.28)}
+.tn-logo-text{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.tn-tabs{display:flex;gap:2px;background:rgba(255,255,255,0.42);border:1px solid rgba(255,255,255,0.68);border-radius:10px;padding:3px}
+.tn-tab{padding:5px 16px;font-size:12.5px;font-weight:500;color:var(--text2);border:none;border-radius:7px;cursor:pointer;background:transparent;transition:all .16s;font-family:var(--sans);white-space:nowrap}
+.tn-tab:hover{background:rgba(255,255,255,0.5);color:var(--text)}
+.tn-tab.active{background:rgba(255,255,255,0.84);color:var(--accent);font-weight:700;box-shadow:0 2px 8px rgba(91,141,238,0.14)}
+.tn-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.tn-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#6fa0f5,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(91,141,238,0.22);flex-shrink:0}
+
+.period-btn{
+  padding:5px 12px;border:none;border-radius:8px;
+  font-family:var(--sans);font-size:11.5px;font-weight:500;
+  color:var(--text2);background:transparent;cursor:pointer;
+  transition:all .15s;white-space:nowrap;
+}
+.period-btn:hover{background:rgba(255,255,255,0.6);color:var(--text)}
+.period-btn.active{
+  background:rgba(255,255,255,0.85);color:var(--accent);font-weight:700;
+  box-shadow:0 2px 8px rgba(91,141,238,0.14);
+}
+
+/* EXPANDABLE TRADE ROWS */
+.expand-btn{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:10px;font-family:var(--mono);font-weight:600;
+  color:var(--accent);background:var(--accent-soft);
+  border:none;border-radius:6px;padding:2px 7px;
+  cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.expand-btn:hover{background:rgba(91,141,238,0.2)}
+.expand-btn .arr{display:inline-block;transition:transform .2s;font-style:normal}
+.expand-btn.open .arr{transform:rotate(90deg)}
+.trade-detail-row{display:none}
+.trade-detail-row.open{display:table-row}
+.trade-detail-cell{padding:0 10px 10px 52px !important;border-bottom:1px solid rgba(255,255,255,0.3) !important}
+.trade-detail-inner{background:rgba(91,141,238,0.04);border:1px solid rgba(91,141,238,0.12);border-radius:10px;overflow:hidden}
+.trade-detail-header{display:grid;grid-template-columns:90px 60px 80px 90px 70px;padding:6px 12px;font-size:9.5px;letter-spacing:0.09em;text-transform:uppercase;font-weight:600;color:var(--text3);font-family:var(--mono);border-bottom:1px solid rgba(91,141,238,0.1)}
+.trade-detail-item{display:grid;grid-template-columns:90px 60px 80px 90px 70px;padding:7px 12px;font-size:11.5px;font-family:var(--mono);border-bottom:1px solid rgba(91,141,238,0.06);transition:background .12s}
+.trade-detail-item:last-child{border-bottom:none}
+.trade-detail-item:hover{background:rgba(91,141,238,0.06)}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="tn-logo">
+    <div class="tn-logo-mark">◈</div>
+    <div class="tn-logo-text">Капітал</div>
+  </div>
+  <div class="tn-tabs">
+    <button class="tn-tab active">📊 Портфель</button>
+    <button class="tn-tab" onclick="window.open('learning.html','_self')">🎓 Навчання</button>
+  </div>
+  <div class="tn-right">
+    <div class="tn-avatar" title="Профіль">Є</div>
+  </div>
+</nav>
+
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-mark">◈</div>
+    <div class="logo-text">Капітал</div>
+    <div class="logo-sub">AI Investment Desk</div>
+  </div>
+  <div class="nav-section">Огляд</div>
+  <div class="nav-item active" onclick="showPage('portfolio',this)">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Мій портфель
+  </div>
+  <div class="nav-item" onclick="showPage('analytics',this)">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Аналітика
+  </div>
+  <div class="nav-item" onclick="showPage('dividends',this)">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Дивіденди
+  </div>
+  <div class="nav-section">Дослідження</div>
+  <div class="nav-item" onclick="showPage('analysis',this)">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>AI-аналіз компанії
+  </div>
+  <div class="nav-item" onclick="showPage('peers',this)">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="12" r="3"/><circle cx="18" cy="7" r="2"/><circle cx="18" cy="17" r="2"/><path d="M11.83 11.3 16 8.7M11.83 12.7 16 15.3"/></svg>Схожі компанії
+  </div>
+  <div class="nav-section">Дані</div>
+  <div class="nav-item" onclick="showPage('import',this)" id="nav-import">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Завантажити звіт
+  </div>
+  <div class="sidebar-bottom">
+    <!-- Subtle data toggle -->
+    <div style="padding:0 12px;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+      <div style="width:6px;height:6px;border-radius:50%;flex-shrink:0;transition:background .2s" id="toggle-dot"></div>
+      <span style="font-size:11px;color:var(--text3);flex:1;font-family:var(--mono)" id="toggle-label">демо</span>
+      <button id="toggle-switch-btn" onclick="switchToLive()"
+        style="font-size:10.5px;font-family:var(--sans);font-weight:500;color:var(--text3);
+        background:transparent;border:none;cursor:pointer;padding:0;text-decoration:underline;
+        text-underline-offset:2px;opacity:0.6;transition:opacity .15s"
+        onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">
+        завантажити
+      </button>
+    </div>
+    <button class="upload-btn" onclick="showPage('import',document.getElementById('nav-import'))">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/><path d="M5 19h14"/></svg>Завантажити звіт
+    </button>
+  </div>
+</aside>
+
+<main class="main">
+
+<!-- ══════════ PORTFOLIO ══════════ -->
+<div class="page active" id="page-portfolio">
+  <div class="page-header">
+    <div class="page-title">Мій портфель</div>
+    <div class="page-sub" id="portfolio-sub">Демо · <span>Квітень 2025</span></div>
+  </div>
+  <div class="mode-banner demo" id="mode-banner" style="display:none">
+    <div class="banner-dot"></div>
+    <span class="banner-text" id="banner-text"></span>
+    <button class="banner-btn" id="banner-btn"></button>
+  </div>
+
+  <!-- PERIOD SELECTOR -->
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+    <div style="display:flex;background:rgba(255,255,255,0.45);border:1px solid rgba(255,255,255,0.7);border-radius:var(--r-sm);padding:3px;gap:2px;backdrop-filter:blur(12px)">
+      <button class="period-btn active" id="pb-all"    onclick="setPeriod('all')"   >Весь час</button>
+      <button class="period-btn"        id="pb-cm"     onclick="setPeriod('cm')"    >Цей місяць</button>
+      <button class="period-btn"        id="pb-cq"     onclick="setPeriod('cq')"    >Цей квартал</button>
+      <button class="period-btn"        id="pb-cy"     onclick="setPeriod('cy')"    >Цей рік</button>
+    </div>
+    <div style="width:1px;height:22px;background:rgba(0,0,0,0.1);flex-shrink:0"></div>
+    <div style="display:flex;background:rgba(255,255,255,0.45);border:1px solid rgba(255,255,255,0.7);border-radius:var(--r-sm);padding:3px;gap:2px;backdrop-filter:blur(12px)">
+      <button class="period-btn"        id="pb-pm"     onclick="setPeriod('pm')"    >Попередній місяць</button>
+      <button class="period-btn"        id="pb-pq"     onclick="setPeriod('pq')"    >Попередній квартал</button>
+      <button class="period-btn"        id="pb-py"     onclick="setPeriod('py')"    >Попередній рік</button>
+    </div>
+    <div style="margin-left:auto;font-size:11px;font-family:var(--mono);color:var(--text3);padding:5px 10px;background:rgba(255,255,255,0.4);border-radius:8px;border:1px solid rgba(255,255,255,0.6)" id="period-label-display">Весь час</div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="info-btn" data-tip="tip-invested">?</div>
+      <div class="stat-icon" style="background:var(--accent-soft)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+      <div class="stat-label">Інвестовано</div>
+      <div class="stat-val" id="s-invested">$0.00</div>
+      <div class="stat-change" id="s-invested-ch" style="color:var(--text3)">Загальна сума угод</div>
+    </div>
+
+    <!-- CARD 2: P&L -->
+    <div class="stat-card">
+      <div class="info-btn" data-tip="tip-pl">?</div>
+      <div class="stat-icon" style="background:var(--green-soft)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
+      <div class="stat-label">Реалізований P&L</div>
+      <div class="stat-val" id="s-return">$0.00</div>
+      <div class="stat-change" id="s-return-ch" style="color:var(--text3)">Після продажів</div>
+    </div>
+
+    <!-- CARD 3: Дивіденди -->
+    <div class="stat-card">
+      <div class="info-btn" data-tip="tip-div">?</div>
+      <div class="stat-icon" style="background:var(--purple-soft)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+      <div class="stat-label">Дивіденди отримано</div>
+      <div class="stat-val pos" id="s-div">$0.00</div>
+      <div class="stat-change" id="s-div-ch" style="color:var(--text3)">Чистими після податку</div>
+    </div>
+
+    <!-- CARD 4: Комісії -->
+    <div class="stat-card">
+      <div class="info-btn" data-tip="tip-fees">?</div>
+      <div class="stat-icon" style="background:var(--amber-soft)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+      <div class="stat-label">Комісії сплачено</div>
+      <div class="stat-val" id="s-fees">$0.00</div>
+      <div class="stat-change" id="s-fees-ch" style="color:var(--text3)">За всі угоди</div>
+    </div>
+
+  </div>
+  <div class="two-col">
+    <div class="gcard gcard-p">
+      <div class="card-header">
+        <div class="card-title">Розподіл по активах</div>
+        <span class="badge b-blue" id="pos-count-badge">— позицій</span>
+      </div>
+      <div class="chart-wrap">
+        <svg width="110" height="110" viewBox="0 0 42 42" id="donut-svg">
+          <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="rgba(0,0,0,0.05)" stroke-width="6.5"/>
+        </svg>
+        <div class="donut-labels" id="donut-labels">
+          <div style="text-align:center;padding:8px 0">
+            <div style="color:var(--text3);font-size:12px;margin-bottom:12px">Завантаж дані для відображення</div>
+            <button class="empty-upload-btn" style="font-size:11.5px;padding:7px 14px" onclick="showPage('import',document.getElementById('nav-import'))">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/><path d="M5 19h14"/></svg>
+              Завантажити
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="gcard gcard-p">
+      <div class="card-header">
+        <div class="card-title">Активність</div>
+        <span class="badge b-amber" id="trades-count-badge">— угод</span>
+      </div>
+      <div id="activity-block" style="display:flex;flex-direction:column;gap:10px;align-items:flex-start">
+        <div style="color:var(--text3);font-size:12.5px;margin-bottom:4px">Завантаж вигрузку з брокера щоб побачити активність</div>
+        <button class="empty-upload-btn" style="font-size:11.5px;padding:7px 14px" onclick="showPage('import',document.getElementById('nav-import'))">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/><path d="M5 19h14"/></svg>
+          Завантажити
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="gcard gcard-p full-col">
+    <div class="card-header">
+      <div class="card-title">Угоди</div>
+      <span class="badge b-green" id="trades-badge">Завантаж дані</span>
+    </div>
+    <div id="trades-table-wrap">
+      <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <div class="empty-title">Даних ще немає</div>
+        <div class="empty-sub">Завантаж файл Trades.xlsx з Freedom Finance<br>щоб побачити всі свої угоди</div>
+        <button class="empty-upload-btn" onclick="showPage('import',document.getElementById('nav-import'))">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/><path d="M5 19h14"/></svg>
+          Завантажити Trades.xlsx
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ ANALYTICS ══════════ -->
+<div class="page" id="page-analytics">
+  <div class="page-header">
+    <div class="page-title">Аналітика</div>
+    <div class="page-sub">AI-інсайти · <span>Глибокий аналіз ефективності</span></div>
+  </div>
+  <div id="analytics-content">
+    <div class="gcard gcard-p full-col">
+      <div class="empty-state">
+        <div class="empty-icon">📊</div>
+        <div class="empty-title">Завантаж дані для аналітики</div>
+        <div class="empty-sub">Після завантаження файлів з брокера тут з'явиться<br>детальний аналіз твого портфеля</div>
+        <button class="empty-upload-btn" onclick="showPage('import',document.getElementById('nav-import'))">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/><path d="M5 19h14"/></svg>
+          Завантажити звіт
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ DIVIDENDS ══════════ -->
+<div class="page" id="page-dividends">
+  <div class="page-header">
+    <div class="page-title">Дивіденди</div>
+    <div class="page-sub">Дохід від <span>дивідендних виплат</span></div>
+  </div>
+
+  <!-- PERIOD SELECTOR -->
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+    <div style="display:flex;background:rgba(255,255,255,0.45);border:1px solid rgba(255,255,255,0.7);border-radius:var(--r-sm);padding:3px;gap:2px;backdrop-filter:blur(12px)">
+      <button class="period-btn active" id="dpb-all" onclick="setDivPeriod('all')">Весь час</button>
+      <button class="period-btn" id="dpb-cm"  onclick="setDivPeriod('cm')">Цей місяць</button>
+      <button class="period-btn" id="dpb-cq"  onclick="setDivPeriod('cq')">Цей квартал</button>
+      <button class="period-btn" id="dpb-cy"  onclick="setDivPeriod('cy')">Цей рік</button>
+    </div>
+    <div style="width:1px;height:22px;background:rgba(0,0,0,0.1);flex-shrink:0"></div>
+    <div style="display:flex;background:rgba(255,255,255,0.45);border:1px solid rgba(255,255,255,0.7);border-radius:var(--r-sm);padding:3px;gap:2px;backdrop-filter:blur(12px)">
+      <button class="period-btn" id="dpb-pm"  onclick="setDivPeriod('pm')">Попередній місяць</button>
+      <button class="period-btn" id="dpb-pq"  onclick="setDivPeriod('pq')">Попередній квартал</button>
+      <button class="period-btn" id="dpb-py"  onclick="setDivPeriod('py')">Попередній рік</button>
+    </div>
+    <div style="margin-left:auto;font-size:11px;font-family:var(--mono);color:var(--text3);padding:5px 10px;background:rgba(255,255,255,0.4);border-radius:8px;border:1px solid rgba(255,255,255,0.6)" id="div-period-display">Весь час</div>
+  </div>
+
+  <div id="dividends-content">
+    <div class="gcard gcard-p full-col">
+      <div class="empty-state">
+        <div class="empty-icon">💵</div>
+        <div class="empty-title">Завантаж tradernet_table.xlsx</div>
+        <div class="empty-sub">Файл з рухом коштів містить інформацію<br>про всі дивідендні виплати та комісії</div>
+        <button class="empty-upload-btn" onclick="showPage('import',document.getElementById('nav-import'))">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/><path d="M5 19h14"/></svg>
+          Завантажити tradernet_table
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ AI ANALYSIS ══════════ -->
+<div class="page" id="page-analysis">
+  <div class="page-header">
+    <div class="page-title">AI-аналіз компанії</div>
+    <div class="page-sub">Введи тікер — отримай <span>глибокий фундаментальний розбір</span></div>
+  </div>
+  <div class="gcard gcard-p full-col">
+    <div class="ai-input-row">
+      <input class="ai-input" id="ticker-input" placeholder="Тікер або назва (AAPL, Google, Ford, NVDA...)" maxlength="100">
+      <button class="ai-btn" id="analyze-btn" onclick="analyzeCompany()">Аналізувати ↗</button>
+    </div>
+    <div class="ai-hint">Підказки з твого портфеля: F.US · AGNC.US · KO.US · MO.US · NVDA.US · UBER.US</div>
+    <div class="ai-result" id="analysis-result" style="color:var(--text3)">Тут з'явиться AI-аналіз: фінансові показники, конкурентна позиція, ризики та потенціал зростання.
+
+Просто введи тікер і натисни кнопку.</div>
+  </div>
+</div>
+
+<!-- ══════════ PEERS ══════════ -->
+<div class="page" id="page-peers">
+  <div class="page-header">
+    <div class="page-title">Схожі компанії</div>
+    <div class="page-sub">Знайди <span>інвестиційні ідеї</span> на основі твоїх позицій</div>
+  </div>
+  <div class="gcard gcard-p full-col" style="margin-bottom:16px">
+    <div class="ai-input-row">
+      <input class="ai-input" id="peers-input" placeholder="Введи тікер (напр. AGNC, KO, NVDA)..." maxlength="20">
+      <button class="ai-btn" id="peers-btn" onclick="findPeers()">Знайти ↗</button>
+    </div>
+    <div class="ai-hint">Аналіз по: сектору · P/E · темпу зростання · дивідендній прибутковості · капіталізації</div>
+  </div>
+  <div id="peers-result" class="gcard gcard-p full-col">
+    <div class="empty-state">
+      <div class="empty-icon">🔗</div>
+      <div class="empty-title">Введи тікер для пошуку</div>
+      <div class="empty-sub">AI знайде компанії з подібними фінансовими показниками<br>та інвестиційними характеристиками</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ IMPORT ══════════ -->
+<div class="page" id="page-import">
+  <div class="page-header">
+    <div class="page-title">Завантажити звіт</div>
+    <div class="page-sub">Вибери брокера, дізнайся де взяти файли і завантаж їх</div>
+  </div>
+
+  <!-- STEP 1: BROKER SELECTION -->
+  <div class="gcard gcard-p full-col">
+    <div class="card-header">
+      <div class="card-title">Крок 1 · Вибери брокера</div>
+      <span class="badge b-blue">1 активний</span>
+    </div>
+    <div class="broker-grid">
+      <div class="broker-card selected" id="broker-ff" onclick="selectBroker('freedom')">
+        <div class="broker-logo">🟦</div>
+        <div class="broker-name">Freedom Finance</div>
+        <div class="broker-desc">Tradernet · Freedom24<br>Підтримується зараз</div>
+        <div class="broker-files">Trades.xlsx + tradernet_table.xlsx</div>
+      </div>
+      <div class="broker-card soon">
+        <div class="broker-logo">📊</div>
+        <div class="broker-name">Interactive Brokers</div>
+        <div class="broker-desc">Activity Statement .csv<br>Буде додано незабаром</div>
+        <div class="broker-files" style="color:var(--text3)">Скоро ·  IBKR</div>
+      </div>
+      <div class="broker-card soon">
+        <div class="broker-logo">🏦</div>
+        <div class="broker-name">Інший брокер</div>
+        <div class="broker-desc">Будь-який CSV / Excel<br>Універсальний імпорт</div>
+        <div class="broker-files" style="color:var(--text3)">Скоро</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: WHERE TO GET FILES -->
+  <div class="gcard gcard-p full-col" id="upload-freedom">
+    <div class="card-header">
+      <div class="card-title">Крок 2 · Де взяти файли у Freedom Finance</div>
+      <span class="badge b-purple">Інструкція</span>
+    </div>
+
+    <div class="two-col" style="margin-bottom:22px">
+      <!-- FILE 1 guide -->
+      <div style="background:rgba(91,141,238,0.05);border:1px solid rgba(91,141,238,0.15);border-radius:var(--r-md);padding:18px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+          <div style="width:32px;height:32px;border-radius:9px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text)">Trades.xlsx</div>
+            <div style="font-size:11px;color:var(--text3)">Файл угод — покупки та продажі</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <div style="width:20px;height:20px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">
+              <span style="font-size:9px;font-weight:700;color:var(--accent);font-family:var(--mono)">1</span>
+            </div>
+            <div>
+              <div style="font-size:12.5px;font-weight:600;color:var(--text)">Відкрий Tradernet або Freedom24</div>
+              <div style="font-size:11px;color:var(--text3)">tradernet.eu або freedom24.com</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <div style="width:20px;height:20px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">
+              <span style="font-size:9px;font-weight:700;color:var(--accent);font-family:var(--mono)">2</span>
+            </div>
+            <div>
+              <div style="font-size:12.5px;font-weight:600;color:var(--text)">Портфоліо → Звіти</div>
+              <div style="font-size:11px;color:var(--text3)">У верхньому меню або боковій панелі</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <div style="width:20px;height:20px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">
+              <span style="font-size:9px;font-weight:700;color:var(--accent);font-family:var(--mono)">3</span>
+            </div>
+            <div>
+              <div style="font-size:12.5px;font-weight:600;color:var(--text)">Вибери «Звіт по угодам»</div>
+              <div style="font-size:11px;color:var(--text3)">Обери потрібний період (за весь час)</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <div style="width:20px;height:20px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">
+              <span style="font-size:9px;font-weight:700;color:var(--accent);font-family:var(--mono)">4</span>
+            </div>
+            <div>
+              <div style="font-size:12.5px;font-weight:600;color:var(--text)">Завантаж як Excel (.xlsx)</div>
+              <div style="font-size:11px;color:var(--text3)">Файл буде названо Trades.xlsx</div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:14px;padding:10px 12px;background:rgba(91,141,238,0.08);border-radius:8px;border-left:3px solid var(--accent)">
+          <div style="font-size:11px;color:var(--text2);line-height:1.55">
+            <strong style="color:var(--accent)">Що містить:</strong> всі угоди купівлі/продажу, кількість, ціна, сума, реалізований P&L, комісія за угоду
+          </div>
+        </div>
+      </div>
+
+      <!-- FILE 2 guide -->
+      <div style="background:rgba(46,158,110,0.05);border:1px solid rgba(46,158,110,0.15);border-radius:var(--r-md);padding:18px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+          <div style="width:32px;height:32px;border-radius:9px;background:var(--green-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text)">tradernet_table.xlsx</div>
+            <div style="font-size:11px;color:var(--text3)">Рух коштів — дивіденди, комісії</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <div style="width:20px;height:20px;border-radius:50%;background:var(--green-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">
+              <span style="font-size:9px;font-weight:700;color:var(--green);font-family:var(--mono)">1</span>
+            </div>
+            <div>
+              <div style="font-size:12.5px;font-weight:600;color:var(--text)">Відкрий Tradernet або Freedom24</div>
+              <div style="font-size:11px;color:var(--text3)">tradernet.eu або freedom24.com</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <div style="width:20px;height:20px;border-radius:50%;background:var(--green-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">
+              <span style="font-size:9px;font-weight:700;color:var(--green);font-family:var(--mono)">2</span>
+            </div>
+            <div>
+              <div style="font-size:12.5px;font-weight:600;color:var(--text)">Портфоліо → Звіти</div>
+              <div style="font-size:11px;color:var(--text3)">У верхньому меню або боковій панелі</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <div style="width:20px;height:20px;border-radius:50%;background:var(--green-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">
+              <span style="font-size:9px;font-weight:700;color:var(--green);font-family:var(--mono)">3</span>
+            </div>
+            <div>
+              <div style="font-size:12.5px;font-weight:600;color:var(--text)">Вибери «Рух коштів»</div>
+              <div style="font-size:11px;color:var(--text3)">Обери весь доступний період</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <div style="width:20px;height:20px;border-radius:50%;background:var(--green-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">
+              <span style="font-size:9px;font-weight:700;color:var(--green);font-family:var(--mono)">4</span>
+            </div>
+            <div>
+              <div style="font-size:12.5px;font-weight:600;color:var(--text)">Завантаж як Excel (.xlsx)</div>
+              <div style="font-size:11px;color:var(--text3)">Файл буде названо tradernet_table.xlsx</div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:14px;padding:10px 12px;background:rgba(46,158,110,0.08);border-radius:8px;border-left:3px solid var(--green)">
+          <div style="font-size:11px;color:var(--text2);line-height:1.55">
+            <strong style="color:var(--green)">Що містить:</strong> дивіденди по кожній акції, утриманий податок (15%/30%), поповнення рахунку, комісії брокера
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: UPLOAD ZONES -->
+    <div class="card-header" style="margin-bottom:14px">
+      <div class="card-title">Крок 3 · Завантаж файли</div>
+      <span class="badge b-green">Підтримується drag & drop</span>
+    </div>
+
+    <div class="two-col" style="margin-bottom:0">
+      <div>
+        <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:8px;font-family:var(--mono);letter-spacing:0.04em;text-transform:uppercase">📈 Trades.xlsx</div>
+        <label class="upload-zone" for="file-trades" id="zone-trades">
+          <div class="upload-icon-wrap">📋</div>
+          <div class="upload-zone-title">Trades.xlsx</div>
+          <div class="upload-zone-sub">Перетягни або натисни для вибору<br><span style="font-family:var(--mono);font-size:10px;color:var(--accent)">Портфоліо → Звіти → Звіт по угодам</span></div>
+          <input type="file" id="file-trades" accept=".xlsx,.xls,.csv" onchange="handleFile(this,'trades')">
+        </label>
+        <div id="status-trades" style="font-size:12px;display:none;padding:8px 10px;background:rgba(46,158,110,0.08);border-radius:8px;border:1px solid rgba(46,158,110,0.2);margin-top:8px"></div>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:8px;font-family:var(--mono);letter-spacing:0.04em;text-transform:uppercase">💰 tradernet_table.xlsx</div>
+        <label class="upload-zone" for="file-cashflow" id="zone-cashflow">
+          <div class="upload-icon-wrap">💳</div>
+          <div class="upload-zone-title">tradernet_table.xlsx</div>
+          <div class="upload-zone-sub">Перетягни або натисни для вибору<br><span style="font-family:var(--mono);font-size:10px;color:var(--green)">Портфоліо → Звіти → Рух коштів</span></div>
+          <input type="file" id="file-cashflow" accept=".xlsx,.xls,.csv" onchange="handleFile(this,'cashflow')">
+        </label>
+        <div id="status-cashflow" style="font-size:12px;display:none;padding:8px 10px;background:rgba(46,158,110,0.08);border-radius:8px;border:1px solid rgba(46,158,110,0.2);margin-top:8px"></div>
+      </div>
+    </div>
+
+    <div id="parse-progress" class="parse-progress">
+      <div style="font-size:12.5px;color:var(--text2)" id="parse-status">Обробляю файли...</div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <!-- SECURITY NOTE -->
+  <div class="gcard gcard-p full-col">
+    <div class="card-header"><div class="card-title">Безпека даних</div><span class="badge b-green">Захищено</span></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+      <div style="text-align:center;padding:12px 8px">
+        <div style="font-size:22px;margin-bottom:8px">🔒</div>
+        <div style="font-size:12px;font-weight:600;margin-bottom:4px">Локальна обробка</div>
+        <div style="font-size:11px;color:var(--text3);line-height:1.5">Файл обробляється лише в браузері, не на сервері</div>
+      </div>
+      <div style="text-align:center;padding:12px 8px">
+        <div style="font-size:22px;margin-bottom:8px">🚫</div>
+        <div style="font-size:12px;font-weight:600;margin-bottom:4px">Без третіх сторін</div>
+        <div style="font-size:11px;color:var(--text3);line-height:1.5">Жодних сторонніх сервісів не отримують твої дані</div>
+      </div>
+      <div style="text-align:center;padding:12px 8px">
+        <div style="font-size:22px;margin-bottom:8px">🗑️</div>
+        <div style="font-size:12px;font-weight:600;margin-bottom:4px">Не зберігається</div>
+        <div style="font-size:11px;color:var(--text3);line-height:1.5">Дані зникають після закриття вкладки</div>
+      </div>
+      <div style="text-align:center;padding:12px 8px">
+        <div style="font-size:22px;margin-bottom:8px">🔐</div>
+        <div style="font-size:12px;font-weight:600;margin-bottom:4px">Зашифровано</div>
+        <div style="font-size:11px;color:var(--text3);line-height:1.5">AI-запити через зашифроване з'єднання HTTPS</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ══════════ STATE ══════════
+let hasRealData = false;
+let isDemoMode = true;
+let selectedBroker = 'freedom';
+let parsedTrades = null;
+let parsedCashflow = null;
+
+// ══════════ NAVIGATION ══════════
+function showPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const page = document.getElementById('page-' + id);
+  if (page) page.classList.add('active');
+  // el can be the nav-item itself (this) or any element — find the matching nav-item by data
+  if (el && el.classList && el.classList.contains('nav-item')) {
+    el.classList.add('active');
+  } else {
+    // fallback: find nav-item whose onclick contains the page id
+    document.querySelectorAll('.nav-item').forEach(n => {
+      const oc = n.getAttribute('onclick') || '';
+      if (oc.includes("'" + id + "'") || oc.includes('"' + id + '"')) {
+        n.classList.add('active');
+      }
+    });
+  }
+}
+
+function selectBroker(b) {
+  selectedBroker = b;
+  document.querySelectorAll('.broker-card:not(.soon)').forEach(c => c.classList.remove('selected'));
+  document.getElementById('broker-' + b).classList.add('selected');
+}
+
+function switchToDemo() {
+  isDemoMode = true;
+  updateToggle();
+  renderDemoPortfolio();
+}
+
+function switchToLive() {
+  if (!hasRealData) {
+    showPage('import', document.getElementById('nav-import'));
+    return;
+  }
+  isDemoMode = false;
+  updateToggle();
+  renderRealData();
+}
+
+function updateToggle() {
+  const dot   = document.getElementById('toggle-dot');
+  const label = document.getElementById('toggle-label');
+  const btn   = document.getElementById('toggle-switch-btn');
+  const sub   = document.getElementById('portfolio-sub');
+
+  if (!hasRealData || isDemoMode) {
+    // Demo mode — very subtle
+    if (dot)   { dot.style.background = 'rgba(136,150,170,0.4)'; }
+    if (label) { label.textContent = 'демо'; label.style.color = 'var(--text3)'; }
+    if (btn)   { btn.textContent = 'завантажити'; btn.onclick = () => showPage('import', document.getElementById('nav-import')); }
+    if (sub)   sub.innerHTML = 'Демо · <span>Freedom Finance</span>';
+  } else {
+    // Live mode — dot goes green, label shows source, btn offers demo switch
+    if (dot)   { dot.style.background = 'var(--green)'; }
+    if (label) { label.textContent = 'мої дані'; label.style.color = 'var(--text2)'; }
+    if (btn)   { btn.textContent = 'демо'; btn.onclick = switchToDemo; }
+    const period = parsedTrades ? getPeriodLabel(parsedTrades) : 'Ваші дані';
+    if (sub)   sub.innerHTML = `Freedom Finance · <span>${period}</span>`;
+  }
+}
+
+// ══════════ BANNER ══════════
+function updateBanner() {
+  updateToggle();
+}
+
+function getPeriodLabel(trades) {
+  if (!trades || !trades.length) return 'Ваші дані';
+  const dates = trades.filter(t => t.date).map(t => t.date);
+  if (!dates.length) return 'Ваші дані';
+  const min = new Date(Math.min(...dates));
+  const max = new Date(Math.max(...dates));
+  const fmt = d => d.toLocaleDateString('uk-UA', { month: 'short', year: 'numeric' });
+  return `${fmt(min)} – ${fmt(max)}`;
+}
+
+// ══════════ FREEDOM FINANCE PARSER ══════════
+// Excel serial date → JS Date
+function excelDateToJS(serial) {
+  if (!serial || isNaN(serial)) return null;
+  const d = new Date((serial - 25569) * 86400 * 1000);
+  return isNaN(d) ? null : d;
+}
+
+function parseFreedomTrades(wb) {
+  const ws = wb.Sheets[wb.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+  if (rows.length < 2) return [];
+
+  // Find header row
+  let hdrIdx = 0;
+  for (let i = 0; i < Math.min(5, rows.length); i++) {
+    const r = rows[i].map(c => String(c).toLowerCase());
+    if (r.some(c => c.includes('тікер') || c.includes('ticker') || c.includes('операція'))) { hdrIdx = i; break; }
+  }
+  const hdr = rows[hdrIdx].map(c => String(c).trim().toLowerCase());
+  const col = k => hdr.findIndex(h => h.includes(k));
+
+  const iDate = col('дата'); const iTicker = col('тікер'); const iOp = col('операція');
+  const iQty = col('quantity') > -1 ? col('quantity') : col('к-сть');
+  const iPrice = col('ціна'); const iSum = col('сума'); const iProfit = col('прибуток'); const iFee = col('плата');
+
+  const trades = [];
+  for (let i = hdrIdx + 1; i < rows.length; i++) {
+    const r = rows[i];
+    const ticker = String(r[iTicker] || '').trim();
+    if (!ticker) continue;
+    const op = String(r[iOp] || '').trim().toLowerCase();
+    trades.push({
+      date: excelDateToJS(r[iDate]),
+      ticker, op,
+      qty: parseFloat(r[iQty]) || 0,
+      price: parseFloat(r[iPrice]) || 0,
+      sum: parseFloat(r[iSum]) || 0,
+      profit: parseFloat(r[iProfit]) || 0,
+      fee: parseFloat(r[iFee]) || 0,
+    });
+  }
+  return trades;
+}
+
+function parseFreedomCashflow(wb) {
+  // Re-read with cellDates so xlsx gives us real Date objects
+  const ws = wb.Sheets[wb.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', raw: false });
+  const rawRows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', raw: true });
+  if (rows.length < 2) return [];
+
+  // Find header row
+  let hdrIdx = 0;
+  for (let i = 0; i < Math.min(5, rows.length); i++) {
+    const r = rows[i].map(c => String(c).toLowerCase());
+    if (r.some(c => c.includes('операція') || c.includes('коментар') || c.includes('сума'))) { hdrIdx = i; break; }
+  }
+  const hdr = rows[hdrIdx].map(c => String(c).trim().toLowerCase());
+  // Smart column finder: prefer exact match, then partial
+  const col = k => {
+    const exact = hdr.findIndex(h => h === k);
+    if (exact > -1) return exact;
+    return hdr.findIndex(h => h.includes(k) && !h.includes(k + ' №') && !h.includes('№'));
+  };
+
+  // Manual column detection for known Freedom Finance format
+  const iDate    = hdr.findIndex(h => h === 'дата');
+  const iOp      = hdr.findIndex(h => h === 'операція');  // exact: not 'операція №'
+  const iComment = hdr.findIndex(h => h.includes('коментар'));
+  const iSum     = hdr.findIndex(h => h === 'сума');
+  const iCur     = hdr.findIndex(h => h.includes('валюта') || h.includes('val'));
+
+  const items = [];
+  for (let i = hdrIdx + 1; i < rows.length; i++) {
+    const r = rows[i];
+    const rRaw = rawRows[i];
+    const op = String(r[iOp] || '').trim();
+    if (!op) continue;
+    const comment = String(r[iComment] || '');
+
+    // Extract ticker — supports both "(AAPL.US)" and "security ( AAPL.US )"
+    const tickerMatch =
+      comment.match(/\(([A-Z0-9]+\.US)\)/) ||
+      comment.match(/security \( ([A-Z0-9]+\.US) \)/);
+
+    // Parse date robustly:
+    // xlsx raw=true: number serial for real dates; raw=false: formatted string like "5/1/2026 10:29:39 AM"
+    let date = null;
+    const rawVal = rRaw[iDate];
+    const strVal = String(r[iDate] || '').trim();
+    if (typeof rawVal === 'number' && rawVal > 40000) {
+      // Excel serial number → JS Date
+      date = new Date(Math.round((rawVal - 25569) * 86400 * 1000));
+    } else if (strVal) {
+      const parsed = new Date(strVal);
+      if (!isNaN(parsed)) date = parsed;
+    }
+
+    const sum = parseFloat(String(r[iSum]).replace(',', '.')) || 0;
+
+    items.push({ date, op, comment, ticker: tickerMatch ? tickerMatch[1] : null, sum, currency: String(r[iCur] || 'USD').trim() });
+  }
+  return items;
+}
+
+// ══════════ FILE UPLOAD HANDLER ══════════
+function handleFile(input, type) {
+  const file = input.files[0]; if (!file) return;
+  const zone = document.getElementById('zone-' + type);
+  const status = document.getElementById('status-' + type);
+
+  zone.classList.add('uploaded');
+  status.style.display = 'block';
+  status.innerHTML = `<span style="color:var(--green);font-weight:600">✓</span> ${file.name} <span style="color:var(--text3);font-family:var(--mono)">(${(file.size / 1024).toFixed(1)} KB)</span> — читаю...`;
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const wb = XLSX.read(e.target.result, { type: 'binary' });
+      if (type === 'trades') {
+        parsedTrades = parseFreedomTrades(wb);
+        status.innerHTML = `<span style="color:var(--green);font-weight:600">✓</span> ${file.name} — знайдено <strong>${parsedTrades.length}</strong> угод`;
+      } else {
+        parsedCashflow = parseFreedomCashflow(wb);
+        const divs = parsedCashflow.filter(r => r.op === 'Дивіденди');
+        const grossDiv = divs.reduce((s,r) => s + r.sum, 0);
+        status.innerHTML = `<span style="color:var(--green);font-weight:600">✓</span> ${file.name} — ${divs.length} виплат дивідендів ($${grossDiv.toFixed(2)} брутто), ${parsedCashflow.length} операцій`;
+      }
+      tryFinalize();
+    } catch (err) {
+      status.innerHTML = `<span style="color:var(--red)">✗</span> Помилка читання: ${err.message}`;
+    }
+  };
+  reader.readAsBinaryString(file);
+}
+
+function tryFinalize() {
+  if (!parsedTrades && !parsedCashflow) return;
+  hasRealData = true;
+  isDemoMode = false;
+  renderRealData();
+  updateToggle();
+
+  const prog = document.getElementById('parse-progress');
+  prog.style.display = 'block';
+  document.getElementById('parse-status').textContent = 'Дані оброблено успішно!';
+  document.getElementById('progress-fill').style.width = '100%';
+  setTimeout(() => {
+    prog.style.display = 'none';
+    showPage('portfolio', document.querySelector('.nav-item'));
+  }, 1200);
+}
+
+// ══════════ PERFORMANCE CHART ══════════
+let chartPeriod = 'all';
+let currentPrices = {}; // ticker → current price (fetched via AI)
+let pricesFetching = false;
+
+function setChartPeriod(key) {
+  chartPeriod = key;
+  document.querySelectorAll('[id^="cpb-"]').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('cpb-' + key);
+  if (btn) btn.classList.add('active');
+  renderPerformanceChart();
+}
+
+async function fetchCurrentPrices(tickers) {
+  if (pricesFetching) return;
+  pricesFetching = true;
+  const pctEl = document.getElementById('perf-pct');
+  const subEl = document.getElementById('perf-sub');
+  if (subEl) subEl.textContent = 'Завантажую поточні ціни...';
+
+  try {
+    const tickerList = tickers.join(', ');
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 400,
+        messages: [{
+          role: 'user',
+          content: `Give me the approximate current market prices for these US stocks as of today: ${tickerList}.
+Reply ONLY with a JSON object like: {"AAPL": 185.20, "NVDA": 430.50, ...}
+Use realistic current prices. No text before or after.`
+        }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text || '{}';
+    const clean = text.replace(/```json|```/g, '').trim();
+    const prices = JSON.parse(clean);
+    Object.entries(prices).forEach(([k, v]) => { currentPrices[k.replace('.US','')] = parseFloat(v) || 0; });
+  } catch(e) {
+    console.warn('Price fetch failed:', e);
+  }
+  pricesFetching = false;
+  renderPerformanceChart();
+}
+
+function renderPerformanceChart() {
+  const canvas = document.getElementById('perf-canvas');
+  const perfEmpty = document.getElementById('perf-empty');
+  if (!canvas) return;
+
+  if (!parsedTrades || !parsedTrades.length) {
+    canvas.style.display = 'none';
+    if (perfEmpty) perfEmpty.style.display = 'block';
+    return;
+  }
+  canvas.style.display = 'block';
+  if (perfEmpty) perfEmpty.style.display = 'none';
+
+  const now = new Date();
+  let fromDate = new Date(2000,0,1);
+  const y = now.getFullYear(), mo = now.getMonth();
+  const cq = Math.floor(mo/3);
+  if (chartPeriod === 'cy') fromDate = new Date(y,0,1);
+  if (chartPeriod === 'cq') fromDate = new Date(y,cq*3,1);
+  if (chartPeriod === 'cm') fromDate = new Date(y,mo,1);
+
+  // Get all buy/sell trades in period, sorted by date
+  const trades = parsedTrades
+    .filter(t => t.date && t.date >= fromDate)
+    .sort((a,b) => a.date - b.date);
+
+  // Build portfolio state: cumulative shares per ticker
+  // Track daily snapshots of invested capital
+  const pos = {}; // ticker → {qty, avgCost}
+  let totalInvested = 0, totalFees = 0, realizedPL = 0;
+
+  trades.forEach(t => {
+    const op = t.op.toLowerCase();
+    const tk = t.ticker?.replace('.US','');
+    if (!tk || t.ticker.includes('/')) return;
+
+    if (op.includes('купівля') || op.includes('buy')) {
+      totalInvested += t.sum;
+      if (!pos[tk]) pos[tk] = { qty: 0, cost: 0 };
+      pos[tk].qty += t.qty;
+      pos[tk].cost += t.sum;
+    }
+    if (op.includes('продаж') || op.includes('sell')) {
+      realizedPL += t.profit || 0;
+      if (pos[tk]) {
+        pos[tk].qty = Math.max(0, pos[tk].qty - t.qty);
+      }
+    }
+    totalFees += t.fee;
+  });
+
+  // Dividends
+  let totalDiv = 0;
+  if (parsedCashflow) {
+    parsedCashflow.filter(r => r.date && r.date >= fromDate).forEach(r => {
+      const op = r.op;
+      if (op === 'Дивіденди' || op === 'Податки') totalDiv += r.sum;
+    });
+  }
+
+  // Trigger price fetch if needed
+  const openTickers = Object.keys(pos).filter(tk => pos[tk].qty > 0.001);
+  const hasPrices = openTickers.length > 0 && openTickers.every(tk => currentPrices[tk]);
+  if (openTickers.length > 0 && !hasPrices && !pricesFetching) {
+    fetchCurrentPrices(openTickers);
+  }
+
+  // Calculate current market value
+  let marketValue = 0;
+  let costBasis = 0;
+  openTickers.forEach(tk => {
+    const p = currentPrices[tk] || 0;
+    const shares = pos[tk].qty;
+    marketValue += p * shares;
+    costBasis += pos[tk].cost;
+  });
+
+  // If no prices yet — use cost basis (0% gain)
+  if (marketValue === 0) marketValue = costBasis;
+
+  const unrealizedPL = marketValue - costBasis;
+  const totalReturn = unrealizedPL + realizedPL + totalDiv;
+  const totalCost = totalInvested || 1;
+  const returnPct = (totalReturn / totalCost) * 100;
+
+  // Update header
+  const pctEl = document.getElementById('perf-pct');
+  const subEl = document.getElementById('perf-sub');
+  if (pctEl) {
+    pctEl.textContent = (returnPct >= 0 ? '+' : '') + returnPct.toFixed(2) + '%';
+    pctEl.style.color = returnPct >= 0 ? 'var(--green)' : 'var(--red)';
+  }
+  if (subEl) {
+    const hasPricesNow = openTickers.length > 0 && openTickers.some(tk => currentPrices[tk]);
+    subEl.textContent = hasPricesNow
+      ? `Нереалізований ${unrealizedPL>=0?'+':''}$${unrealizedPL.toFixed(2)} · Реалізований ${realizedPL>=0?'+':''}$${realizedPL.toFixed(2)}`
+      : 'Завантажую поточні ціни для розрахунку...';
+  }
+
+  const setTxt = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  setTxt('perf-invested', '$' + totalInvested.toFixed(2));
+  const plEl = document.getElementById('perf-pl');
+  if (plEl) { plEl.textContent = (totalReturn>=0?'+':'')+' $'+Math.abs(totalReturn).toFixed(2); plEl.style.color = totalReturn>=0?'var(--green)':'var(--red)'; }
+  setTxt('perf-div', (totalDiv>=0?'+$':'-$')+Math.abs(totalDiv).toFixed(2));
+  setTxt('perf-fees', '-$'+Math.abs(totalFees).toFixed(2));
+
+  // Build chart timeline: cumulative invested value per buy date
+  // Each point = date of trade + cumulative cost basis at that time
+  const buys = parsedTrades
+    .filter(t => (t.op.includes('купівля')||t.op.includes('buy')) && t.date && t.date >= fromDate)
+    .sort((a,b) => a.date - b.date);
+
+  if (!buys.length) {
+    canvas.style.display = 'none';
+    return;
+  }
+
+  // Build time series of cost basis growth
+  const points = [];
+  let cumCost = 0;
+  // first point
+  const d0 = new Date(buys[0].date); d0.setDate(d0.getDate()-1);
+  points.push({ date: d0, cost: 0, value: 0 });
+
+  buys.forEach(t => {
+    cumCost += t.sum;
+    points.push({ date: t.date, cost: cumCost, value: null }); // value filled below
+  });
+
+  // Last point: today with market value
+  points.push({ date: now, cost: cumCost, value: marketValue > 0 ? marketValue + realizedPL + totalDiv : cumCost });
+
+  // Fill value for intermediate points proportionally (simple linear estimate)
+  const firstVal = 0;
+  const lastVal = points[points.length-1].value;
+  points.forEach((p,i) => {
+    if (p.value === null) {
+      const frac = i / (points.length-1);
+      p.value = p.cost * (lastVal / (cumCost||1));
+    }
+  });
+
+  // Y axis: % return at each point
+  const ptsPct = points.map(p => {
+    if (p.cost === 0) return 0;
+    return ((p.value - p.cost) / p.cost) * 100;
+  });
+  ptsPct[0] = 0; // always start at 0
+
+  // Draw
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.parentElement.clientWidth || 600;
+  const H = 140;
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  canvas.style.width = W+'px'; canvas.style.height = H+'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0,0,W,H);
+
+  const minV = Math.min(0, ...ptsPct);
+  const maxV = Math.max(0, ...ptsPct);
+  const range = (maxV - minV) || 1;
+  const pad = {t:8,b:22,l:52,r:12};
+  const cW = W-pad.l-pad.r, cH = H-pad.t-pad.b;
+  const toX = i => pad.l + (i/(ptsPct.length-1))*cW;
+  const toY = v => pad.t + cH - ((v-minV)/range)*cH;
+  const zeroY = toY(0);
+
+  // Grid zero line
+  ctx.strokeStyle = 'rgba(0,0,0,0.1)'; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(pad.l,zeroY); ctx.lineTo(pad.l+cW,zeroY); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Y labels
+  ctx.font='9.5px JetBrains Mono,monospace'; ctx.fillStyle='rgba(100,120,160,0.6)';
+  ctx.textAlign='right'; ctx.textBaseline='middle';
+  [minV,0,maxV].forEach(v => {
+    if(Math.abs(maxV-minV)<0.01) return;
+    ctx.fillText((v>=0?'+':'')+v.toFixed(1)+'%', pad.l-4, toY(v));
+  });
+
+  // Draw smooth colored segments
+  for (let i=0; i<ptsPct.length-1; i++) {
+    const x1=toX(i),y1=toY(ptsPct[i]),x2=toX(i+1),y2=toY(ptsPct[i+1]);
+    const isPos = (ptsPct[i]+ptsPct[i+1])/2 >= 0;
+    ctx.beginPath(); ctx.moveTo(x1,zeroY); ctx.lineTo(x1,y1); ctx.lineTo(x2,y2); ctx.lineTo(x2,zeroY); ctx.closePath();
+    ctx.fillStyle = isPos ? 'rgba(46,158,110,0.13)' : 'rgba(208,82,106,0.13)'; ctx.fill();
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
+    ctx.strokeStyle = isPos ? '#2e9e6e' : '#d0526a'; ctx.lineWidth=2; ctx.lineJoin='round'; ctx.stroke();
+  }
+
+  // End dot
+  const lx=toX(ptsPct.length-1), ly=toY(ptsPct[ptsPct.length-1]);
+  const isLastPos = ptsPct[ptsPct.length-1] >= 0;
+  ctx.beginPath(); ctx.arc(lx,ly,4,0,Math.PI*2);
+  ctx.fillStyle=isLastPos?'#2e9e6e':'#d0526a'; ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,0.9)'; ctx.lineWidth=1.5; ctx.stroke();
+
+  // X labels
+  ctx.fillStyle='rgba(100,120,160,0.55)'; ctx.textAlign='center'; ctx.textBaseline='top'; ctx.font='9px JetBrains Mono,monospace';
+  const step=Math.max(1,Math.floor(points.length/5));
+  for(let i=0;i<points.length;i+=step){
+    const lbl=points[i].date.toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit'});
+    ctx.fillText(lbl,toX(i),H-pad.b+4);
+  }
+}
+
+// ══════════ PERIOD FILTER ══════════
+let activePeriod = 'all';
+
+function getPeriodRange(key) {
+  const now = new Date();
+  const y = now.getFullYear(), m = now.getMonth();
+  const quarter = Math.floor(m / 3);
+  switch(key) {
+    case 'all': return { from: new Date(2000,0,1), to: new Date(2099,11,31) };
+    case 'cm':  return { from: new Date(y,m,1), to: new Date(y,m+1,0,23,59,59) };
+    case 'cq':  return { from: new Date(y,quarter*3,1), to: new Date(y,quarter*3+3,0,23,59,59) };
+    case 'cy':  return { from: new Date(y,0,1), to: new Date(y,11,31,23,59,59) };
+    case 'pm':  return { from: new Date(y,m-1,1), to: new Date(y,m,0,23,59,59) };
+    case 'pq':  return { from: new Date(y,(quarter-1)*3,1), to: new Date(y,quarter*3,0,23,59,59) };
+    case 'py':  return { from: new Date(y-1,0,1), to: new Date(y-1,11,31,23,59,59) };
+    default:    return { from: new Date(2000,0,1), to: new Date(2099,11,31) };
+  }
+}
+
+const PERIOD_LABELS = {
+  all:'Весь час', cm:'Цей місяць', cq:'Цей квартал', cy:'Цей рік',
+  pm:'Попередній місяць', pq:'Попередній квартал', py:'Попередній рік'
+};
+
+function setPeriod(key) {
+  activePeriod = key;
+  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('pb-' + key);
+  if (btn) btn.classList.add('active');
+  const lbl = document.getElementById('period-label-display');
+  if (lbl) lbl.textContent = PERIOD_LABELS[key] || key;
+  if (hasRealData && !isDemoMode) renderRealData();
+}
+
+function filterByPeriod(arr, dateKey = 'date') {
+  if (activePeriod === 'all') return arr;
+  const { from, to } = getPeriodRange(activePeriod);
+  return arr.filter(r => {
+    const d = r[dateKey];
+    return d && d >= from && d <= to;
+  });
+}
+
+// ══════════ RENDER REAL DATA ══════════
+const PALETTE = ['#6fa0f5','#a78bfa','#34a87a','#fb923c','#60c6e0','#f87171','#fbbf24','#a3e635','#e879f9','#38bdf8','#f472b6','#4ade80'];
+
+function cleanTicker(t) {
+  return t ? t.replace('.US', '').replace(' ', '') : t;
+}
+
+function isETF(ticker) {
+  const etfs = ['VOO','QQQ','SPY','IWM','EFA','GLD','GLDM','IAU','SLV','TLT','AGG','IBIT','VTI','ARKK','XLK','VNQ','IBKR','JEPI'];
+  return etfs.includes(cleanTicker(ticker));
+}
+
+function renderRealData() {
+  renderPerformanceChart();
+  renderPortfolioStats();
+  renderDonut();
+  renderTradesTable();
+  renderActivity();
+  renderAnalytics();
+  renderDividends();
+}
+
+function renderPortfolioStats() {
+  if (!parsedTrades && !parsedCashflow) return;
+
+  const trades = filterByPeriod(parsedTrades || [], 'date');
+  const cashflow = filterByPeriod(parsedCashflow || [], 'date');
+
+  let invested = 0, realizedPL = 0, fees = 0;
+  trades.forEach(t => {
+    const op = t.op;
+    if (op.includes('купівля') || op.includes('buy')) invested += t.sum;
+    if (op.includes('продаж') || op.includes('sell')) realizedPL += t.profit;
+    fees += t.fee;
+  });
+
+  let divGross = 0, divTax = 0;
+  let divCount = 0;
+  let divDateMin = null, divDateMax = null;
+  cashflow.forEach(r => {
+    if (r.op === 'Дивіденди') {
+      divGross += r.sum;
+      divCount++;
+      if (r.date) {
+        if (!divDateMin || r.date < divDateMin) divDateMin = r.date;
+        if (!divDateMax || r.date > divDateMax) divDateMax = r.date;
+      }
+    }
+    if (r.op === 'Податки') divTax += r.sum;
+  });
+  const divNet = divGross + divTax;
+
+  const fmtDate = d => d ? d.toLocaleDateString('uk-UA', { month: 'short', year: 'numeric' }) : '?';
+  const divPeriod = parsedCashflow
+    ? (divDateMin && divDateMax
+        ? (divDateMin.getTime() === divDateMax.getTime()
+            ? fmtDate(divDateMin)
+            : `${fmtDate(divDateMin)} – ${fmtDate(divDateMax)}`)
+        : 'Немає виплат')
+    : 'Завантаж tradernet_table';
+
+  const buyCount = trades.filter(t => t.op.includes('купівля') || t.op.includes('buy')).length;
+  const sellCount = trades.filter(t => t.op.includes('продаж') || t.op.includes('sell')).length;
+  const totalTrades = trades.length;
+
+  const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+  set('s-invested', `$${Math.abs(invested).toFixed(2)}`);
+  set('s-invested-ch', `${buyCount} покупок`);
+  set('s-return', (realizedPL >= 0 ? '+' : '') + `$${realizedPL.toFixed(2)}`);
+  document.getElementById('s-return').className = 'stat-val ' + (realizedPL >= 0 ? 'pos' : 'neg');
+  set('s-return-ch', sellCount > 0 ? `${sellCount} продажів` : 'Відкриті позиції');
+  set('s-div', `$${divNet.toFixed(2)}`);
+  set('s-div-ch', parsedCashflow
+    ? (divCount > 0 ? `${divCount} виплат · ${divPeriod}` : 'Ще не було виплат')
+    : 'Завантаж tradernet_table');
+
+  set('s-fees', `-$${fees.toFixed(2)}`);
+  set('s-fees-ch', `За ${totalTrades} угод`);
+
+  // Update tooltip dynamic rows
+  updateTooltipRow('tt-invested-buys', `${buyCount} покупок`);
+  updateTooltipRow('tt-invested-sells', `${sellCount} продажів`);
+  updateTooltipRow('tt-invested-total', `$${Math.abs(invested).toFixed(2)}`);
+  updateTooltipRow('tt-pl-value', (realizedPL >= 0 ? '+' : '') + `$${realizedPL.toFixed(2)}`);
+  updateTooltipRow('tt-pl-sells', `${sellCount} угод`);
+  updateTooltipRow('tt-div-period', divPeriod);
+  updateTooltipRow('tt-div-count', divCount > 0 ? `${divCount} виплат` : 'Ще не було');
+  updateTooltipRow('tt-div-gross', `$${divGross.toFixed(2)}`);
+  updateTooltipRow('tt-div-tax', `-$${Math.abs(divTax).toFixed(2)}`);
+  updateTooltipRow('tt-div-net', `$${divNet.toFixed(2)}`);
+  updateTooltipRow('tt-fees-total', `$${fees.toFixed(2)}`);
+  updateTooltipRow('tt-fees-per', totalTrades > 0 ? `~$${(fees / totalTrades).toFixed(2)}` : '—');
+  updateTooltipRow('tt-fees-trades', `${totalTrades} угод`);
+}
+
+function getPositions() {
+  if (!parsedTrades) return {};
+  const source = filterByPeriod(parsedTrades, 'date');
+  const pos = {};
+  source.forEach(t => {
+    const ticker = t.ticker;
+    if (ticker.includes('/')) return; // skip FX
+    if (!pos[ticker]) pos[ticker] = { ticker, qty: 0, invested: 0, proceeds: 0, trades: 0, fee: 0, buys: [] };
+    const op = t.op.toLowerCase();
+    if (op.includes('купівля') || op.includes('buy')) {
+      pos[ticker].qty += t.qty;
+      pos[ticker].invested += t.sum;
+      pos[ticker].buys.push({ date: t.date, qty: t.qty, price: t.price, sum: t.sum, fee: t.fee });
+    } else if (op.includes('продаж') || op.includes('sell')) {
+      pos[ticker].qty -= t.qty;
+      pos[ticker].proceeds += t.sum;
+    }
+    pos[ticker].trades++;
+    pos[ticker].fee += t.fee;
+  });
+  return pos;
+}
+
+function renderDonut() {
+  const pos = getPositions();
+  const active = Object.values(pos).filter(p => p.qty > 0.001);
+  const total = active.reduce((s, p) => s + p.invested, 0);
+
+  document.getElementById('pos-count-badge').textContent = `${active.length} позицій`;
+
+  const svg = document.getElementById('donut-svg');
+  svg.innerHTML = `<circle cx="21" cy="21" r="15.915" fill="transparent" stroke="rgba(0,0,0,0.05)" stroke-width="6.5"/>`;
+
+  const labels = document.getElementById('donut-labels');
+  labels.innerHTML = '';
+
+  if (!active.length) {
+    labels.innerHTML = '<div style="color:var(--text3);font-size:12px">Активних позицій не знайдено</div>';
+    return;
+  }
+
+  // Sort by invested desc
+  active.sort((a, b) => b.invested - a.invested);
+  const top = active.slice(0, 8);
+
+  let offset = 25;
+  top.forEach((p, i) => {
+    const pct = total > 0 ? (p.invested / total * 100) : 0;
+    const dasharray = pct.toFixed(1) + ' ' + (100 - pct).toFixed(1);
+    const color = PALETTE[i % PALETTE.length];
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', '21'); circle.setAttribute('cy', '21');
+    circle.setAttribute('r', '15.915'); circle.setAttribute('fill', 'transparent');
+    circle.setAttribute('stroke', color); circle.setAttribute('stroke-width', '6.5');
+    circle.setAttribute('stroke-dasharray', dasharray);
+    circle.setAttribute('stroke-dashoffset', String(-offset + 25));
+    svg.appendChild(circle);
+    offset += pct;
+
+    const item = document.createElement('div');
+    item.className = 'dl-item';
+    item.innerHTML = `<div class="dl-dot" style="background:${color}"></div><span class="dl-name">${cleanTicker(p.ticker)}</span><span class="dl-pct">${pct.toFixed(1)}%</span>`;
+    labels.appendChild(item);
+  });
+}
+
+function renderTradesTable() {
+  const wrap = document.getElementById('trades-table-wrap');
+  if (!parsedTrades || !parsedTrades.length) return;
+
+  const filtered = filterByPeriod(parsedTrades, 'date');
+  const recent = [...filtered].filter(t => !t.ticker.includes('/')).sort((a, b) => (b.date || 0) - (a.date || 0)).slice(0, 30);
+
+  document.getElementById('trades-badge').textContent = `${filtered.length} угод`;
+
+  if (!recent.length) {
+    wrap.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Немає угод за цей період</div><div class="empty-sub">Спробуй вибрати інший проміжок часу</div></div>`;
+    return;
+  }
+
+  wrap.innerHTML = `<table class="ptable">
+    <thead><tr><th>Дата</th><th>Актив</th><th>Тип</th><th>Операція</th><th>К-сть</th><th>Ціна</th><th>Сума</th><th>P&L</th><th>Комісія</th></tr></thead>
+    <tbody>${recent.map(t => {
+      const isBuy = t.op.includes('купівля') || t.op.includes('buy');
+      const isSell = t.op.includes('продаж') || t.op.includes('sell');
+      const opColor = isBuy ? 'var(--green)' : isSell ? 'var(--red)' : 'var(--text3)';
+      const opLabel = isBuy ? 'Купівля' : isSell ? 'Продаж' : t.op;
+      const dateStr = t.date ? t.date.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit', year: '2-digit' }) : '—';
+      const etf = isETF(t.ticker);
+      const typeTag = etf ? `<span class="atag atag-etf">ETF</span>` : `<span class="atag atag-stock">Акція</span>`;
+      const plStr = t.profit ? `<span class="${t.profit >= 0 ? 'pos' : 'neg'}" style="font-family:var(--mono);font-size:11.5px">${t.profit >= 0 ? '+' : ''}$${t.profit.toFixed(2)}</span>` : '<span style="color:var(--text3)">—</span>';
+      return `<tr>
+        <td style="font-family:var(--mono);font-size:11px;color:var(--text3)">${dateStr}</td>
+        <td><div class="ticker">${cleanTicker(t.ticker)}</div></td>
+        <td>${typeTag}</td>
+        <td style="color:${opColor};font-size:12px;font-weight:600">${opLabel}</td>
+        <td style="font-family:var(--mono);font-size:12px">${t.qty}</td>
+        <td style="font-family:var(--mono);font-size:12px">$${t.price.toFixed(3)}</td>
+        <td style="font-family:var(--mono);font-size:12px;font-weight:600">$${t.sum.toFixed(2)}</td>
+        <td>${plStr}</td>
+        <td style="font-family:var(--mono);font-size:11px;color:var(--red)">-$${t.fee.toFixed(2)}</td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table>`;
+}
+
+function renderActivity() {
+  const block = document.getElementById('activity-block');
+  const pos = getPositions();
+  const active = Object.values(pos).filter(p => p.qty > 0.001);
+  document.getElementById('trades-count-badge').textContent = `${parsedTrades ? parsedTrades.length : 0} угод`;
+
+  if (!active.length) { block.innerHTML = '<div style="color:var(--text3);font-size:12.5px">Немає відкритих позицій</div>'; return; }
+
+  const top5 = active.sort((a, b) => b.invested - a.invested).slice(0, 5);
+  block.innerHTML = top5.map(p => `
+    <div class="pos-row">
+      <div><div class="ticker">${cleanTicker(p.ticker)}</div><div style="font-size:11px;color:var(--text3)">${p.qty} шт · ${p.trades} угод</div></div>
+      <div style="text-align:right"><div style="font-family:var(--mono);font-size:13px;font-weight:600">$${p.invested.toFixed(2)}</div><div style="font-size:11px;color:var(--text3)">інвестовано</div></div>
+    </div>`).join('');
+}
+
+function renderAnalytics() {
+  if (!parsedTrades && !parsedCashflow) return;
+  const pos = getPositions();
+  const active = Object.values(pos).filter(p => p.qty > 0.001);
+
+  let totalFees = 0, totalPL = 0, totalInvested = 0;
+  if (parsedTrades) parsedTrades.forEach(t => {
+    totalFees += t.fee; totalPL += t.profit;
+    if (t.op.includes('купівля') || t.op.includes('buy')) totalInvested += t.sum;
+  });
+
+  const stockCount = active.filter(p => !isETF(p.ticker)).length;
+  const etfCount   = active.filter(p =>  isETF(p.ticker)).length;
+  const totalPortfolio = active.reduce((s, p) => s + p.invested, 0);
+
+  let divNet = 0;
+  if (parsedCashflow) parsedCashflow.forEach(r => {
+    if (r.op === 'Дивіденди' || r.op === 'Податки') divNet += r.sum;
+  });
+
+  // Sector mapping
+  const SECTOR_MAP = {
+    NVDA:"Технології",MSFT:"Технології",AAPL:"Технології",GOOGL:"Технології",META:"Технології",
+    AMZN:"Технології",CRM:"Технології",TSLA:"Авто",SONY:"Технології",UBER:"Транспорт",
+    F:"Авто",GM:"Авто",BAC:"Фінанси",JPM:"Фінанси",GS:"Фінанси",WFC:"Фінанси",
+    KO:"Споживчі товари",MO:"Споживчі товари",WMT:"Споживчі товари",WBA:"Споживчі товари",
+    JNJ:"Медицина",ABBV:"Медицина",
+    AGNC:"Нерухомість",APLE:"Нерухомість",
+    KMI:"Енергетика",XOM:"Енергетика",
+    ARCC:"Фінанси",HBAN:"Фінанси",
+    WBD:"Медіа",CCL:"Туризм",
+    CERS:"Медицина",RBRK:"Технології",
+    VOO:"ETF S&P 500",QQQ:"ETF Nasdaq",IAU:"ETF Золото",GLDM:"ETF Золото",
+    IBIT:"ETF Крипто",BTCS:"Крипто",
+  };
+  const SECTOR_COLORS = {
+    "Технології":"#6fa0f5","Фінанси":"#34a87a","ETF S&P 500":"#a78bfa",
+    "Споживчі товари":"#fb923c","ETF Золото":"#fbbf24","ETF Nasdaq":"#8b5cf6",
+    "Авто":"#f87171","Нерухомість":"#60c6e0","Транспорт":"#34d399",
+    "Медицина":"#f472b6","Енергетика":"#a3e635","Крипто":"#e879f9",
+    "ETF Крипто":"#c084fc","Медіа":"#94a3b8","Туризм":"#fcd34d","Інше":"#8896aa",
+  };
+
+  // Group by sector
+  const sectorMap = {};
+  active.forEach(p => {
+    const t = cleanTicker(p.ticker);
+    const sec = SECTOR_MAP[t] || 'Інше';
+    if (!sectorMap[sec]) sectorMap[sec] = 0;
+    sectorMap[sec] += p.invested;
+  });
+  const sectors = Object.entries(sectorMap).sort((a,b) => b[1]-a[1]);
+
+  const sorted = [...active].sort((a,b) => b.invested - a.invested);
+
+  // Dividends by ticker for holdings table
+  const divByTicker = {};
+  if (parsedCashflow) {
+    parsedCashflow.forEach(r => {
+      if (r.op === 'Дивіденди' || r.op === 'Податки') {
+        const t = r.ticker || '';
+        if (!divByTicker[t]) divByTicker[t] = 0;
+        divByTicker[t] += r.sum;
+      }
+    });
+  }
+
+  document.getElementById('analytics-content').innerHTML = `
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-label">Всього угод</div><div class="stat-val">${parsedTrades ? parsedTrades.length : 0}</div><div class="stat-change" style="color:var(--text3)">Акції та ETF</div></div>
+      <div class="stat-card"><div class="stat-label">Відкритих позицій</div><div class="stat-val">${active.length}</div><div class="stat-change" style="color:var(--text3)">${stockCount} акцій · ${etfCount} ETF</div></div>
+      <div class="stat-card"><div class="stat-label">Комісії</div><div class="stat-val neg">-$${totalFees.toFixed(2)}</div><div class="stat-change" style="color:var(--text3)">За всі угоди</div></div>
+      <div class="stat-card"><div class="stat-label">Дивіденди (чисто)</div><div class="stat-val pos">$${divNet.toFixed(2)}</div><div class="stat-change pos">Після оподаткування</div></div>
+    </div>
+
+    <div class="two-col" style="margin-bottom:16px">
+      <!-- TREEMAP -->
+      <div class="gcard gcard-p">
+        <div class="card-header"><div class="card-title">Розподіл по тікерах</div><span class="badge b-blue">${active.length} позицій</span></div>
+        <div id="treemap-wrap" style="position:relative;width:100%;height:220px;border-radius:10px;overflow:hidden"></div>
+      </div>
+
+      <!-- SECTOR PIE -->
+      <div class="gcard gcard-p">
+        <div class="card-header"><div class="card-title">Розподіл по секторах</div><span class="badge b-purple">${sectors.length} секторів</span></div>
+        <div style="display:flex;gap:20px;align-items:flex-start">
+          <canvas id="sector-canvas" width="130" height="130" style="flex-shrink:0;margin-top:4px"></canvas>
+          <div style="display:flex;flex-direction:column;gap:7px;flex:1">
+            ${sectors.map(([sec,val]) => {
+              const pct = totalPortfolio > 0 ? (val/totalPortfolio*100) : 0;
+              const col = SECTOR_COLORS[sec] || '#8896aa';
+              return `<div style="display:flex;align-items:center;gap:8px;font-size:11.5px">
+                <div style="width:8px;height:8px;border-radius:50%;background:${col};flex-shrink:0"></div>
+                <span style="flex:1;color:var(--text2);font-weight:500">${sec}</span>
+                <span style="font-family:var(--mono);font-size:11px;color:var(--text);font-weight:500">${pct.toFixed(1)}%</span>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOLDINGS TABLE -->
+    <div class="gcard gcard-p full-col">
+      <div class="card-header"><div class="card-title">Холдинги</div><span class="badge b-blue">${active.length}</span></div>
+      <table class="ptable">
+        <thead>
+          <tr>
+            <th>Актив</th><th>Тип</th><th>К-сть</th>
+            <th>Сер. ціна</th><th>Інвестовано</th>
+            <th>Частка</th><th>Дивіденди</th><th>Комісії</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${sorted.map((p, idx) => {
+            const t = cleanTicker(p.ticker);
+            const pct = totalPortfolio > 0 ? (p.invested/totalPortfolio*100) : 0;
+            const avgPrice = p.qty > 0 ? p.invested/p.qty : 0;
+            const divAmt = divByTicker[p.ticker] || 0;
+            const sec = SECTOR_MAP[t] || 'Інше';
+            const col = SECTOR_COLORS[sec] || '#8896aa';
+            const etf = isETF(p.ticker);
+            const hasMulti = p.buys && p.buys.length >= 2;
+            const rowId = 'td-' + t + '-' + idx;
+
+            const mainRow = `<tr style="cursor:${hasMulti?'pointer':''}" ${hasMulti ? `onclick="toggleTradeDetail('${rowId}')"` : ''}>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="width:28px;height:28px;border-radius:8px;background:${col}22;border:1px solid ${col}44;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <span style="font-family:var(--mono);font-size:8.5px;font-weight:700;color:${col}">${t.slice(0,4)}</span>
+                  </div>
+                  <div>
+                    <div class="ticker">${t}</div>
+                    <div style="font-size:10px;color:var(--text3)">${sec}</div>
+                  </div>
+                </div>
+              </td>
+              <td>${etf?'<span class="atag atag-etf">ETF</span>':'<span class="atag atag-stock">Акція</span>'}</td>
+              <td style="font-family:var(--mono);font-size:12px">
+                <div style="display:flex;align-items:center;gap:7px">
+                  <span>${p.qty}</span>
+                  ${hasMulti ? `<button class="expand-btn" id="btn-${rowId}" onclick="event.stopPropagation();toggleTradeDetail('${rowId}')"><i class="arr">›</i> ${p.buys.length} угод</button>` : ''}
+                </div>
+              </td>
+              <td style="font-family:var(--mono);font-size:12px">$${avgPrice.toFixed(2)}</td>
+              <td style="font-family:var(--mono);font-size:12px;font-weight:600">$${p.invested.toFixed(2)}</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <div style="flex:1;height:4px;background:rgba(0,0,0,0.06);border-radius:2px;overflow:hidden;min-width:40px">
+                    <div style="height:100%;width:${Math.min(pct*3,100)}%;background:${col};border-radius:2px"></div>
+                  </div>
+                  <span style="font-family:var(--mono);font-size:11px;color:var(--text);min-width:36px;text-align:right">${pct.toFixed(1)}%</span>
+                </div>
+              </td>
+              <td style="font-family:var(--mono);font-size:11.5px;${divAmt>0?'color:var(--green)':'color:var(--text3)'}">
+                ${divAmt > 0 ? '+$'+divAmt.toFixed(2) : '—'}
+              </td>
+              <td style="font-family:var(--mono);font-size:11.5px;color:var(--red)">-$${p.fee.toFixed(2)}</td>
+            </tr>`;
+
+            const detailRow = hasMulti ? `<tr class="trade-detail-row" id="${rowId}">
+              <td class="trade-detail-cell" colspan="8">
+                <div class="trade-detail-inner">
+                  <div class="trade-detail-header">
+                    <span>Дата</span><span>К-сть</span><span>Ціна</span><span>Сума</span><span>Комісія</span>
+                  </div>
+                  ${p.buys.sort((a,b)=>(a.date||0)-(b.date||0)).map(b => `
+                  <div class="trade-detail-item">
+                    <span style="color:var(--text3)">${b.date ? b.date.toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit',year:'2-digit'}) : '—'}</span>
+                    <span style="color:var(--text)">${b.qty}</span>
+                    <span style="color:var(--text)">$${b.price.toFixed(2)}</span>
+                    <span style="color:var(--text);font-weight:500">$${b.sum.toFixed(2)}</span>
+                    <span style="color:var(--red)">-$${b.fee.toFixed(2)}</span>
+                  </div>`).join('')}
+                </div>
+              </td>
+            </tr>` : '';
+
+            return mainRow + detailRow;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>`;
+
+  // Draw treemap
+  setTimeout(() => {
+    drawTreemap(sorted, totalPortfolio, SECTOR_COLORS, SECTOR_MAP);
+    drawSectorPie(sectors, SECTOR_COLORS, totalPortfolio);
+  }, 30);
+}
+
+function drawTreemap(items, total, colors, sectorMap) {
+  const wrap = document.getElementById('treemap-wrap');
+  if (!wrap) return;
+  const W = wrap.clientWidth || 360, H = 220;
+
+  // Simple squarified treemap approximation
+  const data = items.map(p => ({
+    t: cleanTicker(p.ticker),
+    val: p.invested,
+    pct: total > 0 ? p.invested/total*100 : 0,
+    col: colors[sectorMap[cleanTicker(p.ticker)] || 'Інше'] || '#8896aa',
+  }));
+
+  let html = '';
+  let x = 0, row = [], rowSum = 0, rowH = 0;
+
+  function flushRow(r, rSum, rH, startX) {
+    let cx = startX;
+    r.forEach(d => {
+      const w = (d.val / rSum) * (W - startX);
+      html += `<div title="${d.t}: ${d.pct.toFixed(1)}%" style="
+        position:absolute;left:${cx.toFixed(1)}px;top:0px;width:${(w-1).toFixed(1)}px;height:${(rH-1).toFixed(1)}px;
+        background:${d.col}22;border:1px solid ${d.col}55;
+        display:flex;flex-direction:column;align-items:center;justify-content:center;
+        overflow:hidden;cursor:default;transition:background .15s;border-radius:4px;
+        " onmouseover="this.style.background='${d.col}44'" onmouseout="this.style.background='${d.col}22'">
+        <span style="font-family:var(--mono);font-size:${w>50?11:9}px;font-weight:700;color:${d.col};text-align:center;padding:2px">${d.t}</span>
+        ${w > 45 ? `<span style="font-size:9px;color:${d.col}bb;font-family:var(--mono)">${d.pct.toFixed(1)}%</span>` : ''}
+      </div>`;
+      cx += w;
+    });
+  }
+
+  // Single-row layout (sorted by size, proportional widths)
+  wrap.innerHTML = '<div style="position:relative;width:100%;height:100%">' +
+    data.map(d => {
+      const w = Math.max((d.val / total) * W, 20);
+      return `<div title="${d.t}: ${d.pct.toFixed(1)}%" style="
+        display:inline-flex;flex-direction:column;align-items:center;justify-content:center;
+        height:100%;width:${(d.val/total*100).toFixed(2)}%;vertical-align:top;
+        background:${d.col}1a;border-right:1px solid ${d.col}33;
+        overflow:hidden;cursor:default;transition:background .15s;
+        " onmouseover="this.style.background='${d.col}33'" onmouseout="this.style.background='${d.col}1a'">
+        <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:${d.col};padding:0 4px;text-align:center">${d.t}</span>
+        <span style="font-size:9.5px;color:${d.col}cc;font-family:var(--mono)">${d.pct.toFixed(1)}%</span>
+      </div>`;
+    }).join('') + '</div>';
+}
+
+function drawSectorPie(sectors, colors, total) {
+  const canvas = document.getElementById('sector-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const cx = 65, cy = 65, r = 55, ri = 32;
+  ctx.clearRect(0,0,130,130);
+
+  let startAngle = -Math.PI/2;
+  sectors.forEach(([sec, val]) => {
+    const slice = (val / total) * Math.PI * 2;
+    const col = colors[sec] || '#8896aa';
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, startAngle, startAngle + slice);
+    ctx.closePath();
+    ctx.fillStyle = col + 'cc';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    startAngle += slice;
+  });
+
+  // Donut hole
+  ctx.beginPath();
+  ctx.arc(cx, cy, ri, 0, Math.PI*2);
+  ctx.fillStyle = 'rgba(240,245,255,0.0)';
+  ctx.fill();
+
+  // Center text
+  ctx.fillStyle = '#1a1f2e';
+  ctx.font = 'bold 14px Montserrat,sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(sectors.length, cx, cy - 7);
+  ctx.font = '9px Montserrat,sans-serif';
+  ctx.fillStyle = '#8896aa';
+  ctx.fillText('секторів', cx, cy + 8);
+}
+
+function renderDividends() {
+  if (!parsedCashflow) return;
+
+  const cashflow = filterDivByPeriod(parsedCashflow);
+
+  const divs  = cashflow.filter(r => r.op === 'Дивіденди');
+  const taxes = cashflow.filter(r => r.op === 'Податки');
+
+  // Group by ticker
+  const byTicker = {};
+  divs.forEach(d => {
+    const t = d.ticker || 'Інше';
+    if (!byTicker[t]) byTicker[t] = { gross: 0, tax: 0, count: 0 };
+    byTicker[t].gross += d.sum;
+    byTicker[t].count++;
+  });
+  taxes.forEach(tx => {
+    const t = tx.ticker || 'Інше';
+    if (!byTicker[t]) byTicker[t] = { gross: 0, tax: 0, count: 0 };
+    byTicker[t].tax += tx.sum;
+  });
+
+  const totalGross = divs.reduce((s, d) => s + d.sum, 0);
+  const totalTax = taxes.reduce((s, t) => s + t.sum, 0);
+  const totalNet = totalGross + totalTax;
+
+  const sorted = Object.entries(byTicker).sort((a, b) => b[1].gross - a[1].gross);
+
+  if (divs.length === 0) {
+    document.getElementById('dividends-content').innerHTML = `
+      <div class="stat-row" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat-card"><div class="stat-label">Всього брутто</div><div class="stat-val pos">$0.00</div><div class="stat-change" style="color:var(--text3)">0 виплат</div></div>
+        <div class="stat-card"><div class="stat-label">Податок</div><div class="stat-val" style="color:var(--text3)">$0.00</div><div class="stat-change neg">—</div></div>
+        <div class="stat-card"><div class="stat-label">Чистий дохід</div><div class="stat-val" style="color:var(--text3)">$0.00</div><div class="stat-change" style="color:var(--text3)">—</div></div>
+      </div>
+      <div class="gcard gcard-p full-col">
+        <div class="empty-state">
+          <div class="empty-icon">💵</div>
+          <div class="empty-title">Немає виплат за цей період</div>
+          <div class="empty-sub">Спробуй вибрати інший проміжок часу або перевір що tradernet_table.xlsx завантажений</div>
+        </div>
+      </div>`;
+    return;
+  }
+
+  document.getElementById('dividends-content').innerHTML = `
+    <div class="stat-row" style="grid-template-columns:repeat(3,1fr)">
+      <div class="stat-card"><div class="stat-label">Всього брутто</div><div class="stat-val pos">$${totalGross.toFixed(2)}</div><div class="stat-change pos">▲ ${divs.length} виплат</div></div>
+      <div class="stat-card"><div class="stat-label">Податок</div><div class="stat-val neg">$${Math.abs(totalTax).toFixed(2)}</div><div class="stat-change neg">Утримано автоматично</div></div>
+      <div class="stat-card"><div class="stat-label">Чистий дохід</div><div class="stat-val pos">$${totalNet.toFixed(2)}</div><div class="stat-change pos">Після оподаткування</div></div>
+    </div>
+    <div class="gcard gcard-p full-col">
+      <div class="card-header"><div class="card-title">Дивіденди по компаніях</div><span class="badge b-green">${sorted.length} компаній</span></div>
+      ${sorted.map(([ticker, d]) => `
+        <div class="div-row">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="ticker">${cleanTicker(ticker)}</div>
+            <span style="font-size:11px;color:var(--text3)">${d.count} виплат</span>
+          </div>
+          <div style="display:flex;gap:20px;align-items:center">
+            <div style="text-align:right"><div style="font-size:10px;color:var(--text3);margin-bottom:2px">Брутто</div><div style="font-family:var(--mono);font-size:12px;color:var(--green)">+$${d.gross.toFixed(2)}</div></div>
+            <div style="text-align:right"><div style="font-size:10px;color:var(--text3);margin-bottom:2px">Податок</div><div style="font-family:var(--mono);font-size:12px;color:var(--red)">$${d.tax.toFixed(2)}</div></div>
+            <div style="text-align:right;min-width:60px"><div style="font-size:10px;color:var(--text3);margin-bottom:2px">Чисто</div><div style="font-family:var(--mono);font-size:12px;font-weight:600;color:var(--text)">$${(d.gross+d.tax).toFixed(2)}</div></div>
+          </div>
+        </div>`).join('')}
+    </div>
+    <div class="gcard gcard-p full-col">
+      <div class="card-header"><div class="card-title">Останні виплати</div></div>
+      ${[...divs].sort((a,b)=>(b.date||0)-(a.date||0)).slice(0,15).map(d=>`
+        <div class="div-row">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="font-family:var(--mono);font-size:11px;color:var(--text3)">${d.date?d.date.toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit',year:'2-digit'}):'—'}</div>
+            <div class="ticker">${cleanTicker(d.ticker||'')}</div>
+          </div>
+          <div class="pos" style="font-family:var(--mono);font-size:12.5px;font-weight:600">+$${d.sum.toFixed(2)}</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ══════════ DIVIDENDS PERIOD ══════════
+let divActivePeriod = 'all';
+
+function setDivPeriod(key) {
+  divActivePeriod = key;
+  document.querySelectorAll('[id^="dpb-"]').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('dpb-' + key);
+  if (btn) btn.classList.add('active');
+  const lbl = document.getElementById('div-period-display');
+  if (lbl) lbl.textContent = PERIOD_LABELS[key] || 'Весь час';
+  renderDividends();
+}
+
+function filterDivByPeriod(arr) {
+  if (divActivePeriod === 'all') return arr;
+  const { from, to } = getPeriodRange(divActivePeriod);
+  return arr.filter(r => r.date && r.date >= from && r.date <= to);
+}
+
+// ══════════ AI FUNCTIONS ══════════
+// Використовуємо sendPrompt — вбудований у Claude artifacts метод
+// який надсилає повідомлення у чат і очікує відповідь
+
+let aiPending = null; // { type, resolve, reject }
+
+// Слухаємо відповідь від Claude через window.addEventListener
+window.addEventListener('message', (e) => {
+  if (aiPending && e.data?.type === 'claude_response') {
+    aiPending.resolve(e.data.text);
+    aiPending = null;
+  }
+});
+
+function askClaude(prompt) {
+  return new Promise((resolve) => {
+    // sendPrompt надсилає текст у Claude чат
+    // Claude відповідає і ми показуємо відповідь напряму в результаті
+    // Оскільки sendPrompt асинхронний і відповідь іде у новий чат-bubble,
+    // ми показуємо placeholder і просимо копіювати відповідь
+    if (typeof sendPrompt === 'function') {
+      // Відкриваємо відповідь у чаті Claude
+      resolve('__USE_CHAT__');
+    } else {
+      resolve(null);
+    }
+  });
+}
+
+async function analyzeCompany() {
+  const input = document.getElementById('ticker-input').value.trim();
+  if (!input) return;
+  const btn = document.getElementById('analyze-btn');
+  const result = document.getElementById('analysis-result');
+
+  btn.disabled = true; btn.textContent = 'Відправляю...';
+  result.className = 'ai-result';
+  result.style.color = 'var(--text2)';
+
+  // Build portfolio context
+  let portfolioCtx = '';
+  if (parsedTrades && !isDemoMode) {
+    const pos = getPositions();
+    const ticker = input.replace('.US', '').toUpperCase();
+    const myPos = Object.values(pos).find(p => cleanTicker(p.ticker).toUpperCase() === ticker);
+    if (myPos) portfolioCtx = ` У моєму портфелі вже є ${myPos.qty} шт ${ticker} на суму $${myPos.invested.toFixed(2)}.`;
+  }
+
+  const prompt = `Зроби стислий AI-аналіз компанії або ETF: "${input}".${portfolioCtx}
+
+Структура (без вступів, одразу по суті, українською):
+🏢 КОМПАНІЯ: [назва та тікер]
+📊 КЛЮЧОВІ МЕТРИКИ: P/E, Forward P/E, капіталізація, виручка, маржа
+📈 ПОТЕНЦІАЛ: оцінка на 12 міс, каталізатори
+⚠️ РИЗИКИ: 3 ключові ризики
+💡 ВИСНОВОК: купувати/тримати/уникати і чому
+🎯 ЦІЛЬОВА ЦІНА: консенсус аналітиків
+
+Не більше 300 слів.`;
+
+  result.innerHTML = `<div style="background:rgba(91,141,238,0.06);border:1px solid rgba(91,141,238,0.2);border-radius:10px;padding:14px;font-size:13px;line-height:1.7;color:var(--text2)">
+    <div style="font-weight:600;color:var(--accent);margin-bottom:8px">📤 Запит відправлено у чат Claude</div>
+    Відповідь з'явиться у чаті вище. Скопіюй її сюди або читай прямо у чаті.
+    <div style="margin-top:10px;padding:10px;background:rgba(255,255,255,0.5);border-radius:8px;font-family:var(--mono);font-size:11px;color:var(--text3)">${input.toUpperCase()} · аналіз запитано</div>
+  </div>`;
+
+  if (typeof sendPrompt === 'function') {
+    sendPrompt(prompt);
+  } else {
+    result.innerHTML = `<div style="color:var(--red);font-size:13px">⚠️ Функція AI доступна лише в Claude artifacts. Відкрий дашборд через Claude.ai</div>`;
+  }
+
+  btn.disabled = false; btn.textContent = 'Аналізувати ↗';
+}
+
+async function findPeers() {
+  const input = document.getElementById('peers-input').value.trim();
+  if (!input) return;
+  const btn = document.getElementById('peers-btn');
+  const result = document.getElementById('peers-result');
+  btn.disabled = true; btn.textContent = 'Відправляю...';
+
+  const prompt = `Для компанії "${input}" знайди 6 схожих публічних компаній для інвестування.
+
+Відповідай ТІЛЬКИ JSON (без тексту до або після):
+{"base":"назва","peers":[{"ticker":"ТІКЕР","name":"Назва","why":"1 речення чому схожа","pe":"P/E або N/A","growth":"+X%","yield":"дивід. прибутковість або N/A","rating":"Buy/Hold/Sell"}]}`;
+
+  result.innerHTML = `<div style="background:rgba(91,141,238,0.06);border:1px solid rgba(91,141,238,0.2);border-radius:10px;padding:14px;font-size:13px;color:var(--text2)">
+    <div style="font-weight:600;color:var(--accent);margin-bottom:8px">📤 Запит відправлено у чат Claude</div>
+    Відповідь з'явиться у чаті вище. Claude поверне список схожих компаній.
+    <div style="margin-top:10px;padding:10px;background:rgba(255,255,255,0.5);border-radius:8px;font-family:var(--mono);font-size:11px;color:var(--text3)">${input.toUpperCase()} · пошук аналогів</div>
+  </div>`;
+
+  if (typeof sendPrompt === 'function') {
+    sendPrompt(prompt);
+  } else {
+    result.innerHTML = `<div style="color:var(--red);font-size:13px">⚠️ Функція AI доступна лише в Claude artifacts. Відкрий дашборд через Claude.ai</div>`;
+  }
+
+  btn.disabled = false; btn.textContent = 'Знайти ↗';
+}
+
+// ══════════ DRAG & DROP ══════════
+['trades', 'cashflow'].forEach(type => {
+  const zone = document.getElementById('zone-' + type);
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('drag');
+    const f = e.dataTransfer.files[0];
+    if (f) {
+      const input = document.getElementById('file-' + type);
+      const dt = new DataTransfer(); dt.items.add(f);
+      input.files = dt.files;
+      handleFile(input, type);
+    }
+  });
+});
+
+document.getElementById('ticker-input').addEventListener('keydown', e => { if (e.key === 'Enter') analyzeCompany(); });
+document.getElementById('peers-input').addEventListener('keydown', e => { if (e.key === 'Enter') findPeers(); });
+
+// ══════════ DEMO DATA ══════════
+const DEMO_POSITIONS = [
+  {ticker:'AAPL.US',qty:5,invested:1842,fee:8.5,trades:3,proceeds:0},
+  {ticker:'NVDA.US',qty:2,invested:765,fee:4.3,trades:2,proceeds:0},
+  {ticker:'MSFT.US',qty:3,invested:1243,fee:5.1,trades:2,proceeds:0},
+  {ticker:'VOO.US', qty:4,invested:2312,fee:6.4,trades:3,proceeds:0},
+  {ticker:'KO.US',  qty:5,invested:329,fee:7.7,trades:4,proceeds:0},
+  {ticker:'AGNC.US',qty:8,invested:78, fee:9.8,trades:5,proceeds:0},
+];
+
+function renderDemoPortfolio() {
+  // Stats
+  const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  set('s-invested','$6,569');
+  set('s-invested-ch','19 покупок');
+  set('s-return','+$0.00');
+  document.getElementById('s-return').className='stat-val';
+  set('s-return-ch','Немає продажів');
+  set('s-div','$0.00');
+  set('s-div-ch','Завантаж tradernet_table');
+  set('s-fees','-$41.80');
+  set('s-fees-ch','За 19 угод');
+
+  // Donut
+  const total = DEMO_POSITIONS.reduce((s,p)=>s+p.invested,0);
+  const colors = ['#6fa0f5','#a78bfa','#34a87a','#fb923c','#60c6e0','#f87171'];
+  const svg = document.getElementById('donut-svg');
+  if (svg) {
+    svg.innerHTML = `<circle cx="21" cy="21" r="15.915" fill="transparent" stroke="rgba(0,0,0,0.05)" stroke-width="6.5"/>`;
+    const labels = document.getElementById('donut-labels');
+    labels.innerHTML = '';
+    let offset = 25;
+    DEMO_POSITIONS.forEach((p,i) => {
+      const pct = p.invested/total*100;
+      const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      c.setAttribute('cx','21'); c.setAttribute('cy','21'); c.setAttribute('r','15.915');
+      c.setAttribute('fill','transparent'); c.setAttribute('stroke',colors[i]);
+      c.setAttribute('stroke-width','6.5');
+      c.setAttribute('stroke-dasharray',pct.toFixed(1)+' '+(100-pct).toFixed(1));
+      c.setAttribute('stroke-dashoffset', String(-(offset-25)));
+      svg.appendChild(c); offset += pct;
+      const item = document.createElement('div');
+      item.className='dl-item';
+      item.innerHTML=`<div class="dl-dot" style="background:${colors[i]}"></div><span class="dl-name">${cleanTicker(p.ticker)}</span><span class="dl-pct">${pct.toFixed(1)}%</span>`;
+      labels.appendChild(item);
+    });
+    document.getElementById('pos-count-badge').textContent='6 позицій (демо)';
+  }
+
+  // Activity
+  const block = document.getElementById('activity-block');
+  if (block) {
+    document.getElementById('trades-count-badge').textContent='19 угод (демо)';
+    block.innerHTML = DEMO_POSITIONS.slice(0,4).map(p=>`
+      <div class="pos-row">
+        <div><div class="ticker">${cleanTicker(p.ticker)}</div><div style="font-size:11px;color:var(--text3)">${p.qty} шт · ${p.trades} угод</div></div>
+        <div style="text-align:right"><div style="font-family:var(--mono);font-size:13px;font-weight:600">$${p.invested.toFixed(0)}</div><div style="font-size:11px;color:var(--text3)">інвестовано</div></div>
+      </div>`).join('');
+  }
+
+  // Trades table
+  const wrap = document.getElementById('trades-table-wrap');
+  if (wrap) {
+    document.getElementById('trades-badge').textContent='19 угод (демо)';
+    const demoTrades = [
+      {date:'12.04.25',ticker:'AAPL',op:'Купівля',qty:2,price:185.20,sum:370.40,pl:'—',fee:2.85,pos:true},
+      {date:'08.04.25',ticker:'NVDA',op:'Купівля',qty:1,price:382.50,sum:382.50,pl:'—',fee:2.17,pos:true},
+      {date:'01.04.25',ticker:'MSFT',op:'Купівля',qty:1,price:414.20,sum:414.20,pl:'—',fee:2.30,pos:true},
+      {date:'25.03.25',ticker:'VOO', op:'Купівля',qty:2,price:578.10,sum:1156.20,pl:'—',fee:3.20,pos:true},
+      {date:'18.03.25',ticker:'KO',  op:'Купівля',qty:3,price:65.93,sum:197.79,pl:'—',fee:4.60,pos:true},
+    ];
+    wrap.innerHTML = `<table class="ptable">
+      <thead><tr><th>Дата</th><th>Актив</th><th>Тип</th><th>Операція</th><th>К-сть</th><th>Ціна</th><th>Сума</th><th>P&L</th><th>Комісія</th></tr></thead>
+      <tbody>${demoTrades.map(t=>`<tr>
+        <td style="font-family:var(--mono);font-size:11px;color:var(--text3)">${t.date}</td>
+        <td><div class="ticker">${t.ticker}</div></td>
+        <td>${isETF(t.ticker)?'<span class="atag atag-etf">ETF</span>':'<span class="atag atag-stock">Акція</span>'}</td>
+        <td style="color:var(--green);font-size:12px;font-weight:600">${t.op}</td>
+        <td style="font-family:var(--mono);font-size:12px">${t.qty}</td>
+        <td style="font-family:var(--mono);font-size:12px">$${t.price.toFixed(2)}</td>
+        <td style="font-family:var(--mono);font-size:12px;font-weight:600">$${t.sum.toFixed(2)}</td>
+        <td style="color:var(--text3)">—</td>
+        <td style="font-family:var(--mono);font-size:11px;color:var(--red)">-$${t.fee.toFixed(2)}</td>
+      </tr>`).join('')}</tbody>
+    </table>
+    <div style="padding:10px 10px 0;font-size:11px;color:var(--text3);font-style:italic">Показано 5 з 19 демо-угод</div>`;
+  }
+}
+
+updateToggle();
+renderDemoPortfolio();
+
+// ══════════ EXPAND TRADE DETAILS ══════════
+function toggleTradeDetail(rowId) {
+  const row = document.getElementById(rowId);
+  const btn = document.getElementById('btn-' + rowId);
+  if (!row) return;
+  const isOpen = row.classList.contains('open');
+  row.classList.toggle('open', !isOpen);
+  if (btn) btn.classList.toggle('open', !isOpen);
+}
+
+// Sync nav active state with the initially active page
+(function syncInitNav() {
+  const activePage = document.querySelector('.page.active');
+  if (!activePage) return;
+  const id = activePage.id.replace('page-', '');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    const oc = n.getAttribute('onclick') || '';
+    if (oc.includes("'" + id + "'") || oc.includes('"' + id + '"')) {
+      n.classList.add('active');
+    } else {
+      n.classList.remove('active');
+    }
+  });
+})();
+</script>
+<!-- TOOLTIP PORTAL -->
+<div id="tt-portal" class="tooltip-box" style="display:none">
+  <div class="tooltip-arrow" id="tt-arrow"></div>
+  <div id="tt-content"></div>
+</div>
+
+<script>
+// ══════════ TOOLTIP DATA ══════════
+const TIPS = {
+  'tip-invested': () => `
+    <div class="tt-title">Інвестовано</div>
+    <div class="tt-row"><span class="tt-key">Що це</span><span class="tt-val">Сума всіх покупок</span></div>
+    <div class="tt-row"><span class="tt-key">Покупок</span><span class="tt-val" id="tt-invested-buys">—</span></div>
+    <div class="tt-row"><span class="tt-key">Продажів</span><span class="tt-val" id="tt-invested-sells">—</span></div>
+    <div class="tt-divider"></div>
+    <div class="tt-row"><span class="tt-key">Разом вкладено</span><span class="tt-val" id="tt-invested-total">—</span></div>
+    <div class="tt-row"><span class="tt-key">Джерело</span><span class="tt-val">Trades.xlsx</span></div>`,
+  'tip-pl': () => `
+    <div class="tt-title">Реалізований P&L</div>
+    <div class="tt-row"><span class="tt-key">Що це</span><span class="tt-val">Зафіксований прибуток / збиток</span></div>
+    <div class="tt-row"><span class="tt-key">Значення</span><span class="tt-val" id="tt-pl-value">—</span></div>
+    <div class="tt-row"><span class="tt-key">Продажів виконано</span><span class="tt-val" id="tt-pl-sells">—</span></div>
+    <div class="tt-divider"></div>
+    <div class="tt-row"><span class="tt-key">Коли виникає</span><span class="tt-val">Тільки після продажу</span></div>
+    <div class="tt-row"><span class="tt-key">Не включає</span><span class="tt-val">Відкриті позиції, комісії</span></div>
+    <div class="tt-row"><span class="tt-key">Джерело</span><span class="tt-val">Колонка «Прибуток»</span></div>`,
+  'tip-div': () => `
+    <div class="tt-title">Дивіденди отримано</div>
+    <div class="tt-row"><span class="tt-key">Період</span><span class="tt-val" id="tt-div-period">—</span></div>
+    <div class="tt-row"><span class="tt-key">Кількість виплат</span><span class="tt-val" id="tt-div-count">—</span></div>
+    <div class="tt-divider"></div>
+    <div class="tt-row"><span class="tt-key">Брутто</span><span class="tt-val" id="tt-div-gross">—</span></div>
+    <div class="tt-row"><span class="tt-key">Податок</span><span class="tt-val" id="tt-div-tax">—</span></div>
+    <div class="tt-row"><span class="tt-key">Чисто на рахунок</span><span class="tt-val" id="tt-div-net">—</span></div>
+    <div class="tt-divider"></div>
+    <div class="tt-row"><span class="tt-key">Ставка податку</span><span class="tt-val">15% або 30% (REIT)</span></div>
+    <div class="tt-row"><span class="tt-key">Джерело</span><span class="tt-val">tradernet_table.xlsx</span></div>`,
+  'tip-fees': () => `
+    <div class="tt-title">Комісії сплачено</div>
+    <div class="tt-row"><span class="tt-key">Всього комісій</span><span class="tt-val" id="tt-fees-total">—</span></div>
+    <div class="tt-row"><span class="tt-key">Кількість угод</span><span class="tt-val" id="tt-fees-trades">—</span></div>
+    <div class="tt-row"><span class="tt-key">Середня за угоду</span><span class="tt-val" id="tt-fees-per">—</span></div>
+    <div class="tt-divider"></div>
+    <div class="tt-row"><span class="tt-key">Тариф Freedom</span><span class="tt-val">мін. $1.2 + від суми</span></div>
+    <div class="tt-row"><span class="tt-key">Джерело</span><span class="tt-val">Колонка «Плата»</span></div>`,
+};
+
+// cached live values to re-inject after portal render
+const ttLiveValues = {};
+
+function updateTooltipRow(id, val) {
+  ttLiveValues[id] = val;
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+
+// ══════════ TOOLTIP PORTAL LOGIC ══════════
+const portal = document.getElementById('tt-portal');
+const arrow  = document.getElementById('tt-arrow');
+let activeBtn = null;
+
+function showTip(btn) {
+  const tipId = btn.getAttribute('data-tip');
+  if (!TIPS[tipId]) return;
+
+  document.getElementById('tt-content').innerHTML = TIPS[tipId]();
+
+  // Re-inject cached live values
+  Object.entries(ttLiveValues).forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  });
+
+  portal.style.display = 'block';
+  portal.style.width   = '230px';
+
+  const btnRect = btn.getBoundingClientRect();
+  const ttW = 230;
+  const ttH = portal.offsetHeight || 180;
+  const vw  = window.innerWidth;
+  const vh  = window.innerHeight;
+  const gap = 8;
+
+  // Vertical: prefer below, fall back to above
+  let top, arrowOnTop;
+  if (btnRect.bottom + gap + ttH < vh - 8) {
+    top = btnRect.bottom + gap;
+    arrowOnTop = true;
+  } else {
+    top = btnRect.top - gap - ttH;
+    arrowOnTop = false;
+  }
+
+  // Horizontal: align right edge of tooltip to right edge of btn, clamp to viewport
+  let left = btnRect.right - ttW;
+  left = Math.max(8, Math.min(left, vw - ttW - 8));
+
+  portal.style.top  = top + 'px';
+  portal.style.left = left + 'px';
+
+  // Arrow position
+  const arrowLeft = btnRect.left + btnRect.width / 2 - left - 4.5;
+  arrow.style.left   = Math.max(10, Math.min(arrowLeft, ttW - 20)) + 'px';
+  arrow.style.right  = 'auto';
+
+  if (arrowOnTop) {
+    arrow.style.top    = '-5px';
+    arrow.style.bottom = 'auto';
+    arrow.style.transform = 'rotate(45deg)';
+    arrow.style.borderLeft  = '1px solid rgba(255,255,255,0.13)';
+    arrow.style.borderTop   = '1px solid rgba(255,255,255,0.13)';
+    arrow.style.borderRight = 'none';
+    arrow.style.borderBottom= 'none';
+  } else {
+    arrow.style.bottom  = '-5px';
+    arrow.style.top     = 'auto';
+    arrow.style.transform = 'rotate(225deg)';
+    arrow.style.borderLeft  = '1px solid rgba(255,255,255,0.13)';
+    arrow.style.borderTop   = '1px solid rgba(255,255,255,0.13)';
+    arrow.style.borderRight = 'none';
+    arrow.style.borderBottom= 'none';
+  }
+
+  requestAnimationFrame(() => portal.classList.add('tt-visible'));
+  activeBtn = btn;
+}
+
+function hideTip() {
+  portal.classList.remove('tt-visible');
+  setTimeout(() => {
+    if (!portal.classList.contains('tt-visible')) {
+      portal.style.display = 'none';
+    }
+  }, 180);
+  activeBtn = null;
+}
+
+document.addEventListener('mouseover', e => {
+  const btn = e.target.closest('[data-tip]');
+  if (btn) { showTip(btn); return; }
+  if (!portal.contains(e.target) && !e.target.closest('[data-tip]')) hideTip();
+});
+
+document.addEventListener('scroll', hideTip, true);
+window.addEventListener('resize', hideTip);
+</script>
+
+</body>
+</html>

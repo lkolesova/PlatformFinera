@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Капітал · Навчання</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg: #f5f0ff;
+  --glass: rgba(255,255,255,0.58);
+  --glass-b: rgba(255,255,255,0.78);
+  --shadow: 0 4px 24px rgba(112,80,200,0.09),0 1px 3px rgba(112,80,200,0.05);
+  --text: #1a1530; --text2: #4a4068; --text3: #9088aa;
+  --accent: #7c5ce8; --accent-s: rgba(124,92,232,0.12);
+  --accent2: #e85c9a; --accent2-s: rgba(232,92,154,0.12);
+  --green: #2ebc7a; --green-s: rgba(46,188,122,0.12);
+  --amber: #e8943c; --amber-s: rgba(232,148,60,0.12);
+  --red: #e05a6a;
+  --mono:'JetBrains Mono',monospace; --sans:'Montserrat',sans-serif;
+  --r-sm:12px;--r-md:16px;--r-lg:22px;--r-xl:28px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-family:var(--sans);font-size:14px;color:var(--text);
+  background:#ede8ff;
+  background-image:
+    radial-gradient(ellipse 800px 600px at 20% 0%,rgba(180,150,255,0.35) 0%,transparent 65%),
+    radial-gradient(ellipse 600px 500px at 80% 90%,rgba(255,140,200,0.22) 0%,transparent 65%),
+    radial-gradient(ellipse 500px 400px at 55% 45%,rgba(200,220,255,0.18) 0%,transparent 60%);
+  min-height:100vh;}
+body{display:flex;flex-direction:column;min-height:100vh}
+
+/* ─── TOP NAV ─── */
+.topnav{
+  position:fixed;top:0;left:0;right:0;z-index:100;height:52px;
+  background:rgba(225,218,255,0.72);
+  backdrop-filter:blur(20px) saturate(1.5);-webkit-backdrop-filter:blur(20px) saturate(1.5);
+  border-bottom:1px solid rgba(255,255,255,0.6);
+  display:flex;align-items:center;padding:0 24px;gap:8px;
+}
+.nav-logo{display:flex;align-items:center;gap:10px;margin-right:20px}
+.nav-logo-mark{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:13px;box-shadow:0 3px 10px rgba(124,92,232,0.3)}
+.nav-logo-text{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.nav-tabs{display:flex;gap:2px;background:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.65);border-radius:10px;padding:3px}
+.nav-tab{padding:5px 16px;font-size:12.5px;font-weight:500;color:var(--text2);border:none;border-radius:7px;cursor:pointer;background:transparent;transition:all .18s;font-family:var(--sans)}
+.nav-tab:hover{background:rgba(255,255,255,0.5);color:var(--text)}
+.nav-tab.active{background:rgba(255,255,255,0.82);color:var(--accent);font-weight:700;box-shadow:0 2px 8px rgba(124,92,232,0.14)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(124,92,232,0.25)}
+
+/* ─── MAIN LAYOUT ─── */
+.app{display:flex;padding-top:52px;min-height:100vh}
+
+/* ─── LEFT SIDEBAR ─── */
+.sidebar{
+  width:220px;flex-shrink:0;position:fixed;top:52px;bottom:0;
+  background:rgba(225,218,255,0.5);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-right:1px solid rgba(255,255,255,0.58);padding:20px 0;overflow-y:auto;
+}
+.s-section{font-size:9.5px;letter-spacing:0.13em;color:var(--text3);padding:16px 20px 6px;text-transform:uppercase;font-weight:600}
+.s-item{display:flex;align-items:center;gap:9px;padding:9px 20px;cursor:pointer;font-size:13px;color:var(--text2);transition:all .15s;margin:1px 8px;border-radius:var(--r-sm);font-weight:500}
+.s-item:hover{background:rgba(255,255,255,0.5);color:var(--text)}
+.s-item.active{background:rgba(255,255,255,0.72);color:var(--accent);font-weight:700;box-shadow:0 2px 10px rgba(124,92,232,0.12)}
+.s-icon{width:15px;height:15px;flex-shrink:0;opacity:.7}
+.s-item.active .s-icon{opacity:1}
+.s-badge{margin-left:auto;font-size:9.5px;font-family:var(--mono);padding:2px 7px;border-radius:10px;background:var(--accent-s);color:var(--accent)}
+
+/* ─── MAIN ─── */
+.main{margin-left:220px;flex:1;padding:32px 36px}
+.lpage{display:none}.lpage.active{display:block}
+@keyframes fu{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.lpage.active{animation:fu .18s ease}
+
+/* ─── GLASS CARD ─── */
+.gc{background:var(--glass);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);border:1px solid var(--glass-b);border-radius:var(--r-lg);box-shadow:var(--shadow)}
+.gcp{padding:22px}
+
+/* ─── PAGE HEADER ─── */
+.ph{margin-bottom:26px}
+.ph-title{font-size:24px;font-weight:700;letter-spacing:-0.5px;margin-bottom:4px}
+.ph-sub{font-size:12.5px;color:var(--text3)}
+.ph-sub b{color:var(--accent);font-family:var(--mono);font-size:11.5px;font-weight:500}
+
+/* ─── BADGE ─── */
+.badge{font-size:10px;font-family:var(--mono);padding:3px 9px;border-radius:20px;font-weight:500}
+.bg{background:var(--green-s);color:var(--green)}
+.ba{background:var(--accent-s);color:var(--accent)}
+.bb{background:var(--accent2-s);color:var(--accent2)}
+.bam{background:var(--amber-s);color:var(--amber)}
+
+/* ─── FILTERS ─── */
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px}
+.filter-btn{padding:6px 14px;font-size:12px;font-weight:500;font-family:var(--sans);border:1px solid rgba(255,255,255,0.65);border-radius:20px;background:rgba(255,255,255,0.45);color:var(--text2);cursor:pointer;transition:all .15s}
+.filter-btn:hover{background:rgba(255,255,255,0.65);color:var(--text)}
+.filter-btn.active{background:rgba(255,255,255,0.82);color:var(--accent);border-color:rgba(124,92,232,0.3);font-weight:600}
+
+/* ─── COURSE CARDS GRID ─── */
+.courses-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:18px}
+.course-card{
+  background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--glass-b);border-radius:var(--r-lg);overflow:hidden;
+  cursor:pointer;transition:all .2s;box-shadow:var(--shadow);
+}
+.course-card:hover{transform:translateY(-3px);box-shadow:0 10px 36px rgba(112,80,200,0.14)}
+.cc-cover{height:160px;position:relative;overflow:hidden}
+.cc-cover-inner{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:52px}
+.cc-tags{position:absolute;top:10px;left:10px;display:flex;gap:5px}
+.cc-tag{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.cc-tag.hit{background:rgba(232,92,154,0.85);color:#fff}
+.cc-tag.new{background:rgba(46,188,122,0.85);color:#fff}
+.cc-tag.soon{background:rgba(124,92,232,0.75);color:#fff}
+.cc-tag.owned{background:rgba(46,188,122,0.9);color:#fff}
+.cc-lock{position:absolute;bottom:10px;right:10px;width:28px;height:28px;background:rgba(0,0,0,0.35);backdrop-filter:blur(6px);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px}
+.cc-body{padding:16px}
+.cc-title{font-size:14px;font-weight:700;margin-bottom:6px;line-height:1.35}
+.cc-meta{display:flex;gap:12px;font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:12px}
+.cc-footer{display:flex;align-items:center;justify-content:space-between}
+.cc-price{font-size:18px;font-weight:700;color:var(--text)}
+.cc-price-free{color:var(--green);font-size:14px;font-weight:600}
+.cc-btn{padding:7px 16px;font-size:12px;font-weight:700;font-family:var(--sans);border:none;border-radius:9px;cursor:pointer;transition:all .15s}
+.cc-btn-buy{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 3px 12px rgba(124,92,232,0.25)}
+.cc-btn-buy:hover{box-shadow:0 5px 18px rgba(124,92,232,0.38);transform:translateY(-1px)}
+.cc-btn-go{background:var(--green-s);color:var(--green);font-weight:700}
+.cc-btn-soon{background:rgba(255,255,255,0.4);color:var(--text3);cursor:default}
+
+/* ─── COURSE PAGE ─── */
+.course-hero{
+  background:linear-gradient(135deg,rgba(124,92,232,0.18) 0%,rgba(232,92,154,0.12) 100%);
+  border:1px solid rgba(255,255,255,0.65);border-radius:var(--r-xl);padding:36px;
+  margin-bottom:24px;
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+}
+.course-hero-cover{font-size:64px;margin-bottom:16px}
+.course-hero-tags{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.course-hero-title{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin-bottom:8px}
+.course-hero-sub{font-size:14px;color:var(--text2);line-height:1.65;margin-bottom:20px;max-width:680px}
+.course-hero-stats{display:flex;gap:20px;flex-wrap:wrap}
+.chs{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:5px}
+.chs span{font-family:var(--mono);font-weight:500;color:var(--text2)}
+
+.course-sticky-cta{
+  position:sticky;bottom:20px;z-index:50;margin-top:24px;
+  background:rgba(255,255,255,0.82);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.9);border-radius:var(--r-lg);
+  padding:16px 22px;display:flex;align-items:center;justify-content:space-between;
+  box-shadow:0 8px 32px rgba(112,80,200,0.16);
+}
+.cta-price{font-size:26px;font-weight:700;color:var(--text);letter-spacing:-0.5px}
+.cta-price-old{font-size:14px;color:var(--text3);text-decoration:line-through;margin-left:8px}
+.cta-btn{padding:12px 28px;font-size:14px;font-weight:700;font-family:var(--sans);border:none;border-radius:12px;cursor:pointer;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 16px rgba(124,92,232,0.3);transition:all .18s}
+.cta-btn:hover{transform:translateY(-2px);box-shadow:0 7px 22px rgba(124,92,232,0.42)}
+.cta-btn.owned{background:linear-gradient(135deg,var(--green),#16a085);box-shadow:0 4px 16px rgba(46,188,122,0.3)}
+
+/* ─── CURRICULUM ─── */
+.curriculum{margin-bottom:20px}
+.module{background:var(--glass);border:1px solid var(--glass-b);border-radius:var(--r-md);margin-bottom:10px;overflow:hidden}
+.module-header{display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer;transition:background .15s}
+.module-header:hover{background:rgba(255,255,255,0.4)}
+.module-arrow{font-size:10px;color:var(--text3);transition:transform .2s;flex-shrink:0}
+.module-arrow.open{transform:rotate(90deg)}
+.module-title{font-size:13px;font-weight:700;flex:1}
+.module-meta{font-size:11px;color:var(--text3);font-family:var(--mono)}
+.lessons-list{border-top:1px solid rgba(255,255,255,0.5)}
+.lesson-row{display:flex;align-items:center;gap:12px;padding:11px 18px 11px 36px;border-bottom:1px solid rgba(255,255,255,0.35);cursor:pointer;transition:background .12s}
+.lesson-row:last-child{border-bottom:none}
+.lesson-row:hover{background:rgba(255,255,255,0.35)}
+.lesson-row.free-lesson{cursor:pointer}
+.lesson-row.locked{cursor:default}
+.lesson-row.locked:hover{background:transparent}
+.lesson-num{font-size:10px;font-family:var(--mono);color:var(--text3);width:22px;flex-shrink:0}
+.lesson-icon{font-size:13px;flex-shrink:0}
+.lesson-title{flex:1;font-size:12.5px;color:var(--text2)}
+.lesson-row.active-lesson .lesson-title{color:var(--accent);font-weight:600}
+.lesson-dur{font-size:10.5px;font-family:var(--mono);color:var(--text3)}
+.lesson-check{font-size:13px;color:var(--green)}
+
+/* ─── PLAYER ─── */
+.player-layout{display:grid;grid-template-columns:1fr 300px;gap:16px;height:calc(100vh - 56px - 64px)}
+.player-left{display:flex;flex-direction:column;gap:14px;overflow-y:auto}
+.player-video{background:rgba(20,10,50,0.85);border-radius:var(--r-lg);aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;box-shadow:0 8px 36px rgba(112,80,200,0.2)}
+.player-video-bg{position:absolute;inset:0;background:linear-gradient(135deg,rgba(124,92,232,0.25),rgba(232,92,154,0.18));display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+.play-btn{width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;transition:all .18s;backdrop-filter:blur(8px)}
+.play-btn:hover{background:rgba(255,255,255,0.28);transform:scale(1.08)}
+.player-title{font-size:16px;font-weight:700;color:rgba(255,255,255,0.92)}
+.player-info{color:rgba(255,255,255,0.5);font-size:12px;font-family:var(--mono)}
+
+.player-tabs{display:flex;gap:2px;background:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.65);border-radius:10px;padding:3px;margin-bottom:12px}
+.player-tab{flex:1;padding:7px;font-size:12px;font-weight:500;font-family:var(--sans);border:none;border-radius:7px;cursor:pointer;background:transparent;color:var(--text2);transition:all .15s}
+.player-tab.active{background:rgba(255,255,255,0.82);color:var(--accent);font-weight:700}
+.player-content{background:var(--glass);border:1px solid var(--glass-b);border-radius:var(--r-lg);padding:20px;min-height:180px}
+
+.player-controls{display:flex;align-items:center;gap:10px;padding:14px 0}
+.pctrl-btn{display:flex;align-items:center;gap:7px;padding:9px 18px;font-size:12.5px;font-weight:600;font-family:var(--sans);border:none;border-radius:10px;cursor:pointer;transition:all .15s}
+.pctrl-prev{background:rgba(255,255,255,0.45);border:1px solid rgba(255,255,255,0.65);color:var(--text2)}
+.pctrl-prev:hover{background:rgba(255,255,255,0.65)}
+.pctrl-next{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 3px 12px rgba(124,92,232,0.25)}
+.pctrl-next:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(124,92,232,0.38)}
+.pctrl-done{background:var(--green-s);color:var(--green);border:1px solid rgba(46,188,122,0.25);margin-left:auto}
+.pctrl-done:hover{background:rgba(46,188,122,0.2)}
+.pctrl-done.checked{background:var(--green);color:#fff}
+
+/* ─── SIDEBAR PANEL (player) ─── */
+.player-sidebar{background:var(--glass);border:1px solid var(--glass-b);border-radius:var(--r-lg);overflow:hidden;display:flex;flex-direction:column}
+.ps-header{padding:16px;border-bottom:1px solid rgba(255,255,255,0.45)}
+.ps-title{font-size:13px;font-weight:700;margin-bottom:4px}
+.ps-prog{height:4px;background:rgba(124,92,232,0.12);border-radius:2px;overflow:hidden}
+.ps-prog-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s}
+.ps-percent{font-size:10.5px;font-family:var(--mono);color:var(--accent);margin-top:4px}
+.ps-list{overflow-y:auto;flex:1}
+
+/* ─── MY COURSES ─── */
+.my-course-card{background:var(--glass);border:1px solid var(--glass-b);border-radius:var(--r-lg);padding:20px;display:flex;gap:18px;align-items:flex-start;cursor:pointer;transition:all .18s;box-shadow:var(--shadow)}
+.my-course-card:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(112,80,200,0.12)}
+.mcc-cover{width:72px;height:72px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0}
+.mcc-info{flex:1}
+.mcc-title{font-size:14px;font-weight:700;margin-bottom:6px}
+.mcc-prog-wrap{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.mcc-prog-bar{flex:1;height:5px;background:rgba(124,92,232,0.1);border-radius:3px;overflow:hidden}
+.mcc-prog-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s}
+.mcc-pct{font-size:11px;font-family:var(--mono);color:var(--accent);font-weight:500;white-space:nowrap}
+.mcc-meta{font-size:11.5px;color:var(--text3)}
+.mcc-btn{padding:8px 18px;font-size:12px;font-weight:700;font-family:var(--sans);border:none;border-radius:9px;cursor:pointer;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 3px 10px rgba(124,92,232,0.22);transition:all .15s;white-space:nowrap;flex-shrink:0;align-self:center}
+.mcc-btn:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(124,92,232,0.35)}
+
+/* ─── CERT CARD ─── */
+.cert-card{background:linear-gradient(135deg,rgba(124,92,232,0.12),rgba(232,92,154,0.08));border:1px solid rgba(255,255,255,0.7);border-radius:var(--r-md);padding:16px 20px;display:flex;align-items:center;gap:14px}
+.cert-icon{font-size:28px;flex-shrink:0}
+.cert-title{font-size:13px;font-weight:600;margin-bottom:3px}
+.cert-date{font-size:11px;color:var(--text3);font-family:var(--mono)}
+.cert-btn{margin-left:auto;padding:6px 14px;font-size:11.5px;font-weight:600;font-family:var(--sans);border:1px solid rgba(124,92,232,0.3);border-radius:8px;background:rgba(124,92,232,0.08);color:var(--accent);cursor:pointer;transition:all .15s}
+.cert-btn:hover{background:rgba(124,92,232,0.15)}
+
+/* ─── AUTHOR ─── */
+.author-card{background:var(--glass);border:1px solid var(--glass-b);border-radius:var(--r-lg);padding:22px;display:flex;gap:18px;align-items:flex-start}
+.author-ava{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#fff;flex-shrink:0}
+.author-name{font-size:15px;font-weight:700;margin-bottom:4px}
+.author-role{font-size:12px;color:var(--accent);font-weight:500;margin-bottom:8px}
+.author-bio{font-size:13px;color:var(--text2);line-height:1.65}
+
+/* ─── REVIEWS ─── */
+.review-card{background:rgba(255,255,255,0.38);border:1px solid rgba(255,255,255,0.6);border-radius:var(--r-md);padding:16px 18px}
+.review-stars{font-size:13px;margin-bottom:6px}
+.review-text{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:10px}
+.review-author{font-size:11.5px;color:var(--text3);font-family:var(--mono)}
+
+/* ─── UTILITIES ─── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.full{margin-bottom:16px}
+.section-title{font-size:15px;font-weight:700;margin-bottom:14px}
+.check-list{display:flex;flex-direction:column;gap:8px}
+.check-item{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--text2);line-height:1.5}
+.check-sym{flex-shrink:0;color:var(--green)}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(124,92,232,0.15);border-radius:2px}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <div class="nav-logo">
+    <div class="nav-logo-mark">◈</div>
+    <div class="nav-logo-text">Капітал</div>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab" onclick="window.open('investment_dashboard.html','_self')">📊 Портфель</button>
+    <button class="nav-tab active">🎓 Навчання</button>
+  </div>
+  <div class="nav-right">
+    <div class="avatar" title="Мій профіль">Є</div>
+  </div>
+</nav>
+
+<div class="app">
+<!-- LEFT SIDEBAR -->
+<aside class="sidebar">
+  <div class="s-section">Навчання</div>
+  <div class="s-item active" onclick="showL('catalog',this)">
+    <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Каталог
+    <span class="s-badge">8</span>
+  </div>
+  <div class="s-item" onclick="showL('my-courses',this)">
+    <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+    Мої курси
+    <span class="s-badge">2</span>
+  </div>
+
+  <div class="s-section">Теми</div>
+  <div class="s-item" onclick="filterCat('all');showL('catalog',document.querySelector('.s-item'))">
+    <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+    Всі курси
+  </div>
+  <div class="s-item" onclick="filterCat('basics');showL('catalog',document.querySelector('.s-item'))">
+    <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+    Основи
+  </div>
+  <div class="s-item" onclick="filterCat('analysis');showL('catalog',document.querySelector('.s-item'))">
+    <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Аналіз акцій
+  </div>
+  <div class="s-item" onclick="filterCat('dividends');showL('catalog',document.querySelector('.s-item'))">
+    <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+    Дивіденди
+  </div>
+  <div class="s-item" onclick="filterCat('etf');showL('catalog',document.querySelector('.s-item'))">
+    <svg class="s-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+    ETF та фонди
+  </div>
+</aside>
+
+<main class="main">
+
+<!-- ═══ CATALOG ═══ -->
+<div class="lpage active" id="lpage-catalog">
+  <div class="ph">
+    <div class="ph-title">Каталог курсів</div>
+    <div class="ph-sub">Обери курс та почни інвестувати впевнено · <b>8 курсів</b></div>
+  </div>
+  <div class="filters" id="cat-filters">
+    <button class="filter-btn active" onclick="filterCat('all',this)">Всі</button>
+    <button class="filter-btn" onclick="filterCat('basics',this)">Основи</button>
+    <button class="filter-btn" onclick="filterCat('analysis',this)">Аналіз акцій</button>
+    <button class="filter-btn" onclick="filterCat('dividends',this)">Дивіденди</button>
+    <button class="filter-btn" onclick="filterCat('etf',this)">ETF та фонди</button>
+    <button class="filter-btn" onclick="filterCat('owned',this)">Куплені</button>
+  </div>
+  <div class="courses-grid" id="courses-grid"></div>
+</div>
+
+<!-- ═══ COURSE PAGE ═══ -->
+<div class="lpage" id="lpage-course">
+  <div style="margin-bottom:16px">
+    <button onclick="showL('catalog')" style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.45);border:1px solid rgba(255,255,255,0.65);border-radius:8px;padding:7px 14px;font-size:12.5px;font-weight:500;color:var(--text2);cursor:pointer;font-family:var(--sans);transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,0.65)'" onmouseout="this.style.background='rgba(255,255,255,0.45)'">
+      ← Назад до каталогу
+    </button>
+  </div>
+  <div id="course-content"></div>
+</div>
+
+<!-- ═══ PLAYER ═══ -->
+<div class="lpage" id="lpage-player">
+  <div style="margin-bottom:12px;display:flex;align-items:center;gap:10px">
+    <button onclick="showL('course')" style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.45);border:1px solid rgba(255,255,255,0.65);border-radius:8px;padding:7px 14px;font-size:12.5px;font-weight:500;color:var(--text2);cursor:pointer;font-family:var(--sans);transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,0.65)'" onmouseout="this.style.background='rgba(255,255,255,0.45)'">← До курсу</button>
+    <div style="font-size:13px;font-weight:600;color:var(--text2)" id="player-breadcrumb">Урок</div>
+  </div>
+  <div id="player-content"></div>
+</div>
+
+<!-- ═══ MY COURSES ═══ -->
+<div class="lpage" id="lpage-my-courses">
+  <div class="ph">
+    <div class="ph-title">Мої курси</div>
+    <div class="ph-sub">Твій прогрес навчання · <b>2 курси</b></div>
+  </div>
+  <div id="my-courses-content"></div>
+</div>
+
+</main>
+</div>
+
+<script>
+// ══════════ DATA ══════════
+const COURSES = [
+  {
+    id:1, cat:'basics', title:'Інвестиції з нуля', emoji:'📈',
+    tag:'hit', tagLabel:'Хіт', price:1290, oldPrice:1890,
+    lessons:24, duration:'6 год', level:'Початківець',
+    owned:true, progress:65, lastLesson:2,
+    short:'Від першого долара до власного портфеля. Курс для тих, хто хоче почати але не знає з чого',
+    desc:'Ти навчишся відкривати брокерський рахунок, купувати перші акції, розуміти ризики та будувати диверсифікований портфель. Жодного зайвого — тільки практика.',
+    for:['Хочеш почати інвестувати але не знаєш як','Вже маєш рахунок але не розумієш що купувати','Хочеш навчитися самостійно аналізувати акції'],
+    gets:['Відкриєш брокерський рахунок','Купиш перші акції впевнено','Побудуєш диверсифікований портфель','Розумітимеш фінансові звіти'],
+    author:'Олена Ковальчук', authorRole:'CFA, 12 років в інвестиціях', authorBio:'Портфельний менеджер у топ-10 українському фонді. Авторка книги «Інвестуй просто». Понад 3000 студентів.',
+    modules:[
+      {title:'Модуль 1. Основи фінансового ринку', lessons:[
+        {title:'Що таке акція і чому вона зростає',dur:'12 хв',free:true,done:true},
+        {title:'Як обрати брокера: порівняння Freedom, IBKR',dur:'18 хв',free:false,done:true},
+        {title:'Відкриття рахунку покроково',dur:'15 хв',free:false,done:false},
+      ]},
+      {title:'Модуль 2. Перші покупки', lessons:[
+        {title:'Як читати котирування та стакан',dur:'14 хв',free:false,done:false},
+        {title:'Маркет vs. лімітний ордер',dur:'10 хв',free:false,done:false},
+        {title:'Перша покупка: практична сесія',dur:'22 хв',free:false,done:false},
+      ]},
+      {title:'Модуль 3. Диверсифікація', lessons:[
+        {title:'Чому не можна вкладати всі гроші в одну акцію',dur:'16 хв',free:false,done:false},
+        {title:'Секторна диверсифікація',dur:'13 хв',free:false,done:false},
+        {title:'Збалансований портфель: приклади',dur:'20 хв',free:false,done:false},
+      ]},
+    ],
+    reviews:[
+      {stars:'⭐⭐⭐⭐⭐',text:'Нарешті зрозуміла як це все працює! За місяць вже маю перші 8 акцій.',author:'Марія К., Київ'},
+      {stars:'⭐⭐⭐⭐⭐',text:'Максимально чітко і без води. Рекомендую всім хто починає.',author:'Сергій Д., Львів'},
+    ]
+  },
+  {
+    id:2, cat:'dividends', title:'Дивідендний портфель', emoji:'💰',
+    tag:'new', tagLabel:'Новий', price:1590, oldPrice:null,
+    lessons:18, duration:'4.5 год', level:'Середній',
+    owned:true, progress:20, lastLesson:0,
+    short:'Стратегія пасивного доходу через дивідендні акції та REIT. Реальні цифри та кейси.',
+    desc:'Вивчиш як відбирати дивідендні акції, що таке REIT, як рахувати дивідендну прибутковість після податків і будувати портфель що платить щомісяця.',
+    for:['Хочеш пасивний дохід від інвестицій','Вже знаєш основи, хочеш поглибитись','Цікавлять REIT та ETF на дивіденди'],
+    gets:['Відберешь 10+ дивідендних акцій','Розумітимеш як рахувати yield після податків','Побудуєш портфель з щомісячними виплатами','Розберешся з AGNC, MO, KO та іншими'],
+    author:'Олена Ковальчук', authorRole:'CFA, 12 років в інвестиціях', authorBio:'Портфельний менеджер у топ-10 українському фонді. Авторка книги «Інвестуй просто». Понад 3000 студентів.',
+    modules:[
+      {title:'Модуль 1. Основи дивідендів', lessons:[
+        {title:'Що таке дивіденди і як вони нараховуються',dur:'11 хв',free:true,done:true},
+        {title:'Record date, ex-dividend date: що потрібно знати',dur:'14 хв',free:false,done:false},
+        {title:'Dividend yield та payout ratio',dur:'12 хв',free:false,done:false},
+      ]},
+      {title:'Модуль 2. Відбір акцій', lessons:[
+        {title:'Скринери для пошуку дивідендних акцій',dur:'18 хв',free:false,done:false},
+        {title:'Аналіз AGNC, MO, KO, HBAN',dur:'25 хв',free:false,done:false},
+        {title:'Чому деякі дивіденди небезпечні',dur:'13 хв',free:false,done:false},
+      ]},
+      {title:'Модуль 3. REIT', lessons:[
+        {title:'Що таке REIT і чому 30% податок',dur:'15 хв',free:false,done:false},
+        {title:'Аналіз APLE, AGNC, O',dur:'20 хв',free:false,done:false},
+      ]},
+    ],
+    reviews:[
+      {stars:'⭐⭐⭐⭐⭐',text:'За 3 місяці побудувала портфель що платить $80 на місяць.',author:'Анна В., Одеса'},
+      {stars:'⭐⭐⭐⭐',text:'Дуже детально про REIT, цього ніде більше не знайшла.',author:'Оксана М., Харків'},
+    ]
+  },
+  {
+    id:3, cat:'analysis', title:'Фундаментальний аналіз', emoji:'🔬',
+    tag:null, price:1990, oldPrice:2490,
+    lessons:32, duration:'9 год', level:'Просунутий',
+    owned:false, progress:0, lastLesson:0,
+    short:'Читати фінансову звітність, рахувати P/E, EV/EBITDA та знаходити недооцінені компанії.',
+    desc:'Глибокий курс для тих хто хоче самостійно аналізувати компанії як аналітик. Баланс, P&L, cash flow — розберемо на реальних прикладах.',
+    for:['Вже маєш базу, хочеш аналізувати самостійно','Хочеш розуміти що за цифрами у звітах','Готовий витратити час на глибоке навчання'],
+    gets:['Читатимеш 10-K та квартальні звіти','Рахуватимеш ключові мультиплікатори','Будеш знаходити недооцінені компанії','Зрозумієш як думає Воррен Баффет'],
+    author:'Дмитро Шевченко', authorRole:'CFA Level 3, колишній аналітик Goldman Sachs', authorBio:'10 років у корпоративних фінансах. Аналізував компанії в Лондоні та Варшаві. Зараз навчає українських інвесторів.',
+    modules:[
+      {title:'Модуль 1. Фінансова звітність', lessons:[
+        {title:'Як читати баланс компанії',dur:'20 хв',free:true,done:false},
+        {title:'P&L: виручка, EBITDA, чистий прибуток',dur:'22 хв',free:false,done:false},
+        {title:'Cash Flow Statement: найважливіший документ',dur:'18 хв',free:false,done:false},
+        {title:'Де знайти звітність: SEC, Bloomberg',dur:'12 хв',free:false,done:false},
+      ]},
+      {title:'Модуль 2. Мультиплікатори', lessons:[
+        {title:'P/E та Forward P/E: що вони говорять',dur:'16 хв',free:false,done:false},
+        {title:'EV/EBITDA та EV/Sales',dur:'14 хв',free:false,done:false},
+        {title:'Price/Book та інші мультиплікатори',dur:'13 хв',free:false,done:false},
+        {title:'Порівняльний аналіз у секторі',dur:'24 хв',free:false,done:false},
+      ]},
+    ],
+    reviews:[
+      {stars:'⭐⭐⭐⭐⭐',text:'Найкращий курс з фундаментального аналізу що я проходив.',author:'Іван П., Дніпро'},
+    ]
+  },
+  {
+    id:4, cat:'etf', title:'ETF та індексне інвестування', emoji:'📊',
+    tag:null, price:890, oldPrice:null,
+    lessons:14, duration:'3.5 год', level:'Початківець',
+    owned:false, progress:0, lastLesson:0,
+    short:'VOO, QQQ, IAU та інші ETF — простий спосіб інвестувати в ринок без вибору акцій.',
+    desc:'Ти зрозумієш що таке ETF, як вони відрізняються від акцій, навчишся обирати між VOO та SPY, зрозумієш комісії та податки.',
+    for:['Хочеш прості інвестиції без складного аналізу','Вже маєш ETF але не розумієш різниці між ними','Хочеш диверсифікуватись без великого капіталу'],
+    gets:['Розумітимеш різницю між VOO, SPY, QQQ','Обереш ETF для свого портфеля','Знатимеш як ETF оподатковується','Зрозумієш expense ratio та реплікацію'],
+    author:'Олена Ковальчук', authorRole:'CFA, 12 років в інвестиціях', authorBio:'Портфельний менеджер у топ-10 українському фонді. Авторка книги «Інвестуй просто». Понад 3000 студентів.',
+    modules:[
+      {title:'Модуль 1. Що таке ETF', lessons:[
+        {title:'ETF vs акція vs пайовий фонд',dur:'13 хв',free:true,done:false},
+        {title:'Як ETF відслідковує індекс',dur:'15 хв',free:false,done:false},
+        {title:'Expense ratio та прихованні витрати',dur:'10 хв',free:false,done:false},
+      ]},
+      {title:'Модуль 2. Огляд популярних ETF', lessons:[
+        {title:'VOO та SPY: S&P 500',dur:'18 хв',free:false,done:false},
+        {title:'QQQ: Nasdaq 100',dur:'14 хв',free:false,done:false},
+        {title:'IAU та GLDM: золото',dur:'12 хв',free:false,done:false},
+        {title:'IBIT: крипто ETF',dur:'11 хв',free:false,done:false},
+      ]},
+    ],
+    reviews:[
+      {stars:'⭐⭐⭐⭐⭐',text:'Нарешті зрозумів чим відрізняється VOO від QQQ!',author:'Роман Г., Вінниця'},
+    ]
+  },
+  {
+    id:5, cat:'basics', title:'Психологія інвестора', emoji:'🧠',
+    tag:null, price:690, oldPrice:null,
+    lessons:10, duration:'2.5 год', level:'Будь-який',
+    owned:false, progress:0, lastLesson:0,
+    short:'Чому ми продаємо на дні і купуємо на піку? Біхевіоральні фінанси для інвесторів.',
+    desc:'Розберемо типові психологічні помилки інвесторів: FOMO, panic selling, confirmation bias. Навчишся будувати систему прийняття рішень без емоцій.',
+    for:['Помічаєш що емоції впливають на твої рішення','Продавав на паніці і потім шкодував','Хочеш дисциплінованої стратегії'],
+    gets:['Розпізнаватимеш когнітивні упередження','Матимеш чіткі правила входу і виходу','Навчишся вести інвестиційний щоденник','Перестанеш панічно продавати'],
+    author:'Олена Ковальчук', authorRole:'CFA, 12 років в інвестиціях', authorBio:'Портфельний менеджер у топ-10 українському фонді. Авторка книги «Інвестуй просто». Понад 3000 студентів.',
+    modules:[
+      {title:'Модуль 1. Упередження', lessons:[
+        {title:'FOMO та як він руйнує портфелі',dur:'14 хв',free:true,done:false},
+        {title:'Loss aversion: чому збитки болять більше',dur:'12 хв',free:false,done:false},
+        {title:'Herding та соціальні мережі',dur:'11 хв',free:false,done:false},
+      ]},
+    ],
+    reviews:[]
+  },
+  {
+    id:6, cat:'analysis', title:'Технічний аналіз для інвестора', emoji:'📉',
+    tag:null, price:1190, oldPrice:null,
+    lessons:20, duration:'5 год', level:'Середній',
+    owned:false, progress:0, lastLesson:0,
+    short:'Свічки, рівні підтримки, ковзні середні — як використовувати ТА для покращення точок входу.',
+    desc:'Не трейдинг, а практичний ТА для довгострокового інвестора. Навчишся обирати кращі моменти для купівлі вже обраних фундаментально сильних акцій.',
+    for:['Хочеш купувати на відкатах, а не на піку','Цікавить технічний аналіз без надмірного трейдингу','Комбінуєш фундаментальний та технічний аналіз'],
+    gets:['Читатимеш свічкові графіки','Визначатимеш рівні підтримки та опору','Використовуватимеш ковзні середні','Матимеш кращі точки входу'],
+    author:'Дмитро Шевченко', authorRole:'CFA Level 3, колишній аналітик Goldman Sachs', authorBio:'10 років у корпоративних фінансах.',
+    modules:[
+      {title:'Модуль 1. Основи ТА', lessons:[
+        {title:'Японські свічки: 15 ключових патернів',dur:'20 хв',free:true,done:false},
+        {title:'Рівні підтримки та опору',dur:'18 хв',free:false,done:false},
+      ]},
+    ],
+    reviews:[]
+  },
+  {
+    id:7, cat:'dividends', title:'Рентні стратегії: REIT та BDC', emoji:'🏢',
+    tag:'soon', tagLabel:'Скоро', price:1490, oldPrice:null,
+    lessons:0, duration:'—', level:'Середній',
+    owned:false, progress:0, lastLesson:0,
+    short:'Поглиблений курс по REIT та BDC — компаніях що платять 30-50% прибутку як дивіденди.',
+    desc:'Скоро',
+    for:[],gets:[],author:'',authorRole:'',authorBio:'',modules:[],reviews:[]
+  },
+  {
+    id:8, cat:'basics', title:'Податки інвестора в Україні', emoji:'🧾',
+    tag:'soon', tagLabel:'Скоро', price:0, oldPrice:null,
+    lessons:0, duration:'—', level:'Будь-який',
+    owned:false, progress:0, lastLesson:0,
+    short:'ПДФО з дивідендів, продажу акцій, декларація — все що потрібно знати українському інвестору.',
+    desc:'Скоро',
+    for:[],gets:[],author:'',authorRole:'',authorBio:'',modules:[],reviews:[]
+  },
+];
+
+let activeCourse = null;
+let activeLesson = {moduleIdx:0, lessonIdx:0};
+let activeTab = 'notes';
+
+// ══════════ NAVIGATION ══════════
+function showL(id, el) {
+  document.querySelectorAll('.lpage').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.s-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('lpage-' + id).classList.add('active');
+  if (el && el.classList) el.classList.add('active');
+  // sync sidebar
+  if (id === 'catalog') document.querySelectorAll('.s-item')[0]?.classList.add('active');
+  if (id === 'my-courses') document.querySelectorAll('.s-item')[1]?.classList.add('active');
+}
+
+// ══════════ CATALOG ══════════
+const COLORS = {
+  basics:   'linear-gradient(135deg,#6fa0f5,#a78bfa)',
+  analysis: 'linear-gradient(135deg,#f5a06f,#e85c9a)',
+  dividends:'linear-gradient(135deg,#2ebc7a,#6fa0f5)',
+  etf:      'linear-gradient(135deg,#fbbf24,#f5a06f)',
+};
+
+function renderCatalog(filter='all') {
+  const grid = document.getElementById('courses-grid');
+  const list = filter === 'all' ? COURSES
+    : filter === 'owned' ? COURSES.filter(c => c.owned)
+    : COURSES.filter(c => c.cat === filter);
+
+  grid.innerHTML = list.map(c => {
+    const isSoon = c.tag === 'soon';
+    const isOwned = c.owned;
+    const bg = COLORS[c.cat] || COLORS.basics;
+    const tagHtml = c.tag ? `<span class="cc-tag ${c.tag}">${c.tagLabel}</span>` : '';
+    const ownedTag = isOwned ? `<span class="cc-tag owned">✓ Куплено</span>` : '';
+
+    const btnHtml = isSoon
+      ? `<button class="cc-btn cc-btn-soon" disabled>Скоро</button>`
+      : isOwned
+        ? `<button class="cc-btn cc-btn-go" onclick="event.stopPropagation();openCourse(${c.id},true)">Продовжити →</button>`
+        : `<button class="cc-btn cc-btn-buy" onclick="event.stopPropagation();buyCourse(${c.id})">Придбати</button>`;
+
+    const priceHtml = isSoon ? `<span class="cc-price-free">Незабаром</span>`
+      : c.price === 0 ? `<span class="cc-price-free">Безкоштовно</span>`
+      : isOwned ? `<span style="font-size:13px;color:var(--green);font-weight:600">Доступно</span>`
+      : `<div><span class="cc-price">${c.price.toLocaleString()} ₴</span>${c.oldPrice?`<span style="font-size:11px;color:var(--text3);text-decoration:line-through;margin-left:6px">${c.oldPrice.toLocaleString()}</span>`:''}</div>`;
+
+    const metaHtml = isSoon ? '' : `<div class="cc-meta"><span>📚 ${c.lessons} уроків</span><span>⏱ ${c.duration}</span><span>🎯 ${c.level}</span></div>`;
+    const progHtml = isOwned && c.progress > 0 ? `<div style="margin-bottom:10px"><div style="height:3px;background:rgba(124,92,232,0.1);border-radius:2px;overflow:hidden"><div style="height:100%;width:${c.progress}%;background:linear-gradient(90deg,var(--accent),var(--accent2))"></div></div><div style="font-size:10px;color:var(--accent);font-family:var(--mono);margin-top:3px">${c.progress}% пройдено</div></div>` : '';
+
+    return `<div class="course-card" onclick="openCourse(${c.id})">
+      <div class="cc-cover" style="background:${bg}">
+        <div class="cc-cover-inner">${c.emoji}</div>
+        <div class="cc-tags">${tagHtml}${ownedTag}</div>
+        ${!isOwned && !isSoon ? '<div class="cc-lock">🔒</div>' : ''}
+      </div>
+      <div class="cc-body">
+        <div class="cc-title">${c.title}</div>
+        ${metaHtml}
+        <div style="font-size:12px;color:var(--text3);line-height:1.5;margin-bottom:12px">${c.short}</div>
+        ${progHtml}
+        <div class="cc-footer">${priceHtml}${btnHtml}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+let currentFilter = 'all';
+function filterCat(cat, btn) {
+  currentFilter = cat;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderCatalog(cat);
+}
+
+// ══════════ COURSE PAGE ══════════
+function openCourse(id, goPlayer=false) {
+  activeCourse = COURSES.find(c => c.id === id);
+  if (!activeCourse) return;
+  if (goPlayer) { openPlayer(activeCourse.lastLesson || 0, 0); return; }
+
+  const c = activeCourse;
+  const bg = COLORS[c.cat] || COLORS.basics;
+  const isSoon = c.tag === 'soon';
+
+  const forHtml = c.for.map(f => `<div class="check-item"><span class="check-sym">✓</span>${f}</div>`).join('');
+  const getsHtml = c.gets.map(g => `<div class="check-item"><span class="check-sym">⭐</span>${g}</div>`).join('');
+
+  let lessonGlobalIdx = 0;
+  const modulesHtml = c.modules.map((m, mi) => {
+    const lessonsHtml = m.lessons.map((l, li) => {
+      const idx = lessonGlobalIdx++;
+      const icon = l.done ? '✅' : l.free ? '▶️' : '🔒';
+      const cls = `lesson-row ${l.free||c.owned?'free-lesson':'locked'} ${l.done?'done-lesson':''}`;
+      const onclick = (l.free || c.owned) ? `onclick="openPlayer(${mi},${li})"` : '';
+      return `<div class="${cls}" ${onclick}>
+        <span class="lesson-num">${String(idx+1).padStart(2,'0')}</span>
+        <span class="lesson-icon">${icon}</span>
+        <span class="lesson-title">${l.title}</span>
+        <span class="lesson-dur">${l.dur}</span>
+        ${l.done ? '<span class="lesson-check">✓</span>' : ''}
+      </div>`;
+    }).join('');
+    const doneCnt = m.lessons.filter(l=>l.done).length;
+    return `<div class="module">
+      <div class="module-header" onclick="this.querySelector('.module-arrow').classList.toggle('open');this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
+        <span class="module-arrow open">›</span>
+        <span class="module-title">${m.title}</span>
+        <span class="module-meta">${doneCnt}/${m.lessons.length} уроків</span>
+      </div>
+      <div class="lessons-list">${lessonsHtml}</div>
+    </div>`;
+  }).join('');
+
+  const reviewsHtml = c.reviews.map(r => `
+    <div class="review-card">
+      <div class="review-stars">${r.stars}</div>
+      <div class="review-text">${r.text}</div>
+      <div class="review-author">— ${r.author}</div>
+    </div>`).join('');
+
+  const ctaBtn = c.owned
+    ? `<button class="cta-btn owned" onclick="openPlayer(${c.lastLesson||0},0)">Продовжити навчання →</button>`
+    : isSoon ? `<button class="cta-btn" style="background:rgba(124,92,232,0.3);cursor:default">Скоро</button>`
+    : `<button class="cta-btn" onclick="buyCourse(${c.id})">Придбати курс</button>`;
+
+  document.getElementById('course-content').innerHTML = `
+
+    ${c.owned ? `
+    <!-- OWNED: CTA prominent at top -->
+    <div style="background:linear-gradient(135deg,rgba(46,188,122,0.12),rgba(124,92,232,0.08));border:1px solid rgba(46,188,122,0.25);border-radius:var(--r-xl);padding:24px 28px;margin-bottom:20px;display:flex;align-items:center;gap:20px">
+      <div style="font-size:44px">${c.emoji}</div>
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <span class="badge bg">✓ Куплено</span>
+          <span class="badge ba">${c.level}</span>
+        </div>
+        <div style="font-size:20px;font-weight:700;letter-spacing:-0.3px;margin-bottom:4px">${c.title}</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:10px">
+          <div style="flex:1;height:6px;background:rgba(124,92,232,0.1);border-radius:3px;overflow:hidden;max-width:240px">
+            <div style="height:100%;width:${c.progress}%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px"></div>
+          </div>
+          <span style="font-size:12px;font-family:var(--mono);color:var(--accent);font-weight:600">${c.progress}% пройдено</span>
+          <span style="font-size:12px;color:var(--text3)">📚 ${c.lessons} уроків · ⏱ ${c.duration}</span>
+        </div>
+      </div>
+      <button class="cta-btn owned" onclick="openPlayer(${c.lastLesson||0},0)" style="font-size:15px;padding:14px 32px">Продовжити навчання →</button>
+    </div>
+
+    <!-- Curriculum always visible for owned -->
+    ${c.modules.length?`<div class="full"><div class="section-title">Програма курсу</div><div class="curriculum">${modulesHtml}</div></div>`:''}
+
+    <!-- Collapsible details -->
+    <div style="margin-bottom:20px">
+      <button onclick="toggleCourseDetails()" id="details-toggle"
+        style="display:flex;align-items:center;gap:8px;padding:10px 18px;background:rgba(255,255,255,0.42);border:1px solid rgba(255,255,255,0.65);border-radius:10px;font-size:12.5px;font-weight:500;color:var(--text2);cursor:pointer;font-family:var(--sans);transition:all .15s;width:100%;justify-content:center"
+        onmouseover="this.style.background='rgba(255,255,255,0.62)'" onmouseout="this.style.background='rgba(255,255,255,0.42)'">
+        <span id="details-arrow" style="transition:transform .2s">›</span>
+        Про курс, автор та відгуки
+      </button>
+      <div id="course-details" style="display:none;margin-top:12px">
+        <div style="font-size:13.5px;color:var(--text2);line-height:1.7;padding:16px 20px;background:rgba(255,255,255,0.35);border-radius:var(--r-md);border:1px solid rgba(255,255,255,0.6);margin-bottom:12px">${c.desc}</div>
+        <div class="two-col">
+          ${c.for.length?`<div class="gc gcp"><div class="section-title">Для кого цей курс</div><div class="check-list">${forHtml}</div></div>`:'<div></div>'}
+          ${c.gets.length?`<div class="gc gcp"><div class="section-title">Що ти отримаєш</div><div class="check-list">${getsHtml}</div></div>`:'<div></div>'}
+        </div>
+        ${c.author?`<div class="full author-card" style="margin-bottom:12px">
+          <div class="author-ava">${c.author[0]}</div>
+          <div><div class="author-name">${c.author}</div><div class="author-role">${c.authorRole}</div><div class="author-bio">${c.authorBio}</div></div>
+        </div>`:''}
+        ${reviewsHtml?`<div class="full"><div class="section-title">Відгуки</div><div style="display:flex;flex-direction:column;gap:10px">${reviewsHtml}</div></div>`:''}
+      </div>
+    </div>
+
+    ` : `
+
+    <!-- NOT OWNED: full sales page -->
+    <div class="course-hero" style="background:linear-gradient(135deg,${bg.replace('linear-gradient(135deg,','').replace(')','')}22 0%,rgba(232,92,154,0.08) 100%)">
+      <div class="course-hero-cover">${c.emoji}</div>
+      <div class="course-hero-tags">
+        ${c.tag && c.tag!=='soon'?`<span class="badge bb">${c.tagLabel}</span>`:''}
+        <span class="badge ba">${c.level}</span>
+      </div>
+      <div class="course-hero-title">${c.title}</div>
+      <div class="course-hero-sub">${c.desc}</div>
+      <div class="course-hero-stats">
+        <div class="chs">📚 <span>${c.lessons} уроків</span></div>
+        <div class="chs">⏱ <span>${c.duration}</span></div>
+        <div class="chs">🎯 <span>${c.level}</span></div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      ${c.for.length?`<div class="gc gcp"><div class="section-title">Для кого цей курс</div><div class="check-list">${forHtml}</div></div>`:'<div></div>'}
+      ${c.gets.length?`<div class="gc gcp"><div class="section-title">Що ти отримаєш</div><div class="check-list">${getsHtml}</div></div>`:'<div></div>'}
+    </div>
+
+    ${c.modules.length?`<div class="full"><div class="section-title">Програма курсу</div><div class="curriculum">${modulesHtml}</div></div>`:''}
+
+    ${c.author?`<div class="full"><div class="section-title">Автор</div>
+      <div class="author-card">
+        <div class="author-ava">${c.author[0]}</div>
+        <div><div class="author-name">${c.author}</div><div class="author-role">${c.authorRole}</div><div class="author-bio">${c.authorBio}</div></div>
+      </div></div>`:''}
+
+    ${reviewsHtml?`<div class="full"><div class="section-title">Відгуки</div><div style="display:flex;flex-direction:column;gap:10px">${reviewsHtml}</div></div>`:''}
+
+    <div class="course-sticky-cta">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:8px">
+          <div class="cta-price">${c.price===0?'Безкоштовно':c.price.toLocaleString()+' ₴'}</div>
+          ${c.oldPrice?`<div class="cta-price-old">${c.oldPrice.toLocaleString()} ₴</div>`:''}
+        </div>
+        <div style="font-size:11.5px;color:var(--text3);margin-top:3px">Довічний доступ до курсу</div>
+      </div>
+      ${isSoon ? `<button class="cta-btn" style="background:rgba(124,92,232,0.3);cursor:default">Скоро</button>`
+               : `<button class="cta-btn" onclick="buyCourse(${c.id})">Придбати курс</button>`}
+    </div>
+    `}`;
+
+  showL('course');
+}
+
+function buyCourse(id) {
+  alert('💳 Оплата курсу (демо) — у реальному проекті тут платіжна форма');
+}
+
+function toggleCourseDetails() {
+  const details = document.getElementById('course-details');
+  const arrow   = document.getElementById('details-arrow');
+  const btn     = document.getElementById('details-toggle');
+  const isOpen  = details.style.display !== 'none';
+  details.style.display = isOpen ? 'none' : 'block';
+  arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(90deg)';
+  btn.querySelector('span:last-child') && (btn.childNodes[btn.childNodes.length-1].textContent = isOpen ? ' Про курс, автор та відгуки' : ' Сховати деталі');
+}
+
+// ══════════ PLAYER ══════════
+function openPlayer(moduleIdx, lessonIdx) {
+  if (!activeCourse) return;
+  activeLesson = {moduleIdx, lessonIdx};
+  activeTab = 'notes';
+  renderPlayer();
+  showL('player');
+}
+
+function renderPlayer() {
+  const c = activeCourse;
+  const {moduleIdx, lessonIdx} = activeLesson;
+  const mod = c.modules[moduleIdx];
+  const lesson = mod?.lessons[lessonIdx];
+  if (!lesson) return;
+
+  document.getElementById('player-breadcrumb').textContent = `${c.title} · ${lesson.title}`;
+
+  // Calc progress
+  const totalL = c.modules.reduce((s,m)=>s+m.lessons.length,0);
+  const doneL  = c.modules.reduce((s,m)=>s+m.lessons.filter(l=>l.done).length,0);
+  const progPct = totalL > 0 ? Math.round(doneL/totalL*100) : 0;
+
+  // Sidebar lesson tree
+  let globalIdx = 0;
+  const sidebarHtml = c.modules.map((m, mi) => {
+    const doneMod = m.lessons.filter(l=>l.done).length;
+    const lessonsHtml = m.lessons.map((l, li) => {
+      const isActive = mi===moduleIdx && li===lessonIdx;
+      return `<div class="lesson-row ${isActive?'active-lesson':''}" onclick="activeLesson={moduleIdx:${mi},lessonIdx:${li}};renderPlayer()" style="padding-left:14px">
+        <span class="lesson-icon" style="font-size:12px">${l.done?'✅':'▶️'}</span>
+        <span class="lesson-title" style="font-size:11.5px">${l.title}</span>
+        <span class="lesson-dur">${l.dur}</span>
+      </div>`;
+    }).join('');
+    return `<div>
+      <div style="padding:10px 14px 6px;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid rgba(255,255,255,0.35)">${m.title} <span style="color:var(--accent)">${doneMod}/${m.lessons.length}</span></div>
+      ${lessonsHtml}
+    </div>`;
+  }).join('');
+
+  // Notes content
+  const noteContent = `<div style="font-size:13.5px;line-height:1.8;color:var(--text2)">
+    <p style="margin-bottom:12px"><strong>📝 Конспект: ${lesson.title}</strong></p>
+    <p style="margin-bottom:10px">Ключові тези цього уроку:</p>
+    <ul style="padding-left:18px;display:flex;flex-direction:column;gap:7px">
+      <li>Основна концепція уроку та практичне застосування</li>
+      <li>Важливі терміни та визначення які потрібно запам'ятати</li>
+      <li>Приклади з реального ринку та портфелів</li>
+      <li>Помилки яких варто уникати</li>
+    </ul>
+    <div style="margin-top:16px;padding:12px 14px;background:rgba(124,92,232,0.07);border-radius:10px;border-left:3px solid var(--accent)">
+      💡 <strong>Головний висновок:</strong> Застосовуй знання з цього уроку одразу — відкрий свій брокерський рахунок і перевір.
+    </div>
+  </div>`;
+
+  const materialsContent = `<div style="display:flex;flex-direction:column;gap:10px">
+    <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.45);border-radius:10px;border:1px solid rgba(255,255,255,0.65)">
+      <span style="font-size:20px">📄</span>
+      <div style="flex:1"><div style="font-size:13px;font-weight:600">Слайди до уроку.pdf</div><div style="font-size:11px;color:var(--text3)">2.4 MB</div></div>
+      <button style="padding:6px 12px;font-size:12px;font-weight:600;font-family:var(--sans);border:1px solid rgba(124,92,232,0.3);border-radius:8px;background:var(--accent-s);color:var(--accent);cursor:pointer">Завантажити</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.45);border-radius:10px;border:1px solid rgba(255,255,255,0.65)">
+      <span style="font-size:20px">📊</span>
+      <div style="flex:1"><div style="font-size:13px;font-weight:600">Таблиця для розрахунків.xlsx</div><div style="font-size:11px;color:var(--text3)">0.8 MB</div></div>
+      <button style="padding:6px 12px;font-size:12px;font-weight:600;font-family:var(--sans);border:1px solid rgba(124,92,232,0.3);border-radius:8px;background:var(--accent-s);color:var(--accent);cursor:pointer">Завантажити</button>
+    </div>
+  </div>`;
+
+  // Prev/Next
+  const allLessons = c.modules.flatMap((m,mi)=>m.lessons.map((_,li)=>({mi,li})));
+  const curIdx = allLessons.findIndex(x=>x.mi===moduleIdx&&x.li===lessonIdx);
+  const prevL = curIdx > 0 ? allLessons[curIdx-1] : null;
+  const nextL = curIdx < allLessons.length-1 ? allLessons[curIdx+1] : null;
+  const isDone = lesson.done;
+
+  document.getElementById('player-content').innerHTML = `
+    <div class="player-layout">
+      <div class="player-left">
+        <div class="player-video">
+          <div class="player-video-bg">
+            <div class="play-btn" onclick="this.innerHTML='⏸'">▶</div>
+            <div class="player-title">${lesson.title}</div>
+            <div class="player-info">${c.title} · ${lesson.dur}</div>
+          </div>
+        </div>
+
+        <div class="player-controls">
+          ${prevL?`<button class="pctrl-btn pctrl-prev" onclick="activeLesson={moduleIdx:${prevL.mi},lessonIdx:${prevL.li}};renderPlayer()">← Попередній</button>`:'<div></div>'}
+          <button class="pctrl-btn pctrl-done ${isDone?'checked':''}" id="done-btn" onclick="toggleDone(${moduleIdx},${lessonIdx})">
+            ${isDone?'✅ Пройдено':'Позначити як пройдений'}
+          </button>
+          ${nextL?`<button class="pctrl-btn pctrl-next" onclick="activeLesson={moduleIdx:${nextL.mi},lessonIdx:${nextL.li}};renderPlayer()">Наступний →</button>`:''}
+        </div>
+
+        <div>
+          <div class="player-tabs">
+            <button class="player-tab ${activeTab==='notes'?'active':''}" onclick="activeTab='notes';renderPlayer()">📝 Конспект</button>
+            <button class="player-tab ${activeTab==='materials'?'active':''}" onclick="activeTab='materials';renderPlayer()">📎 Матеріали</button>
+          </div>
+          <div class="player-content">
+            ${activeTab==='notes'?noteContent:materialsContent}
+          </div>
+        </div>
+      </div>
+
+      <div class="player-sidebar">
+        <div class="ps-header">
+          <div class="ps-title">${c.title}</div>
+          <div class="ps-prog"><div class="ps-prog-fill" style="width:${progPct}%"></div></div>
+          <div class="ps-percent">${progPct}% пройдено · ${doneL}/${totalL} уроків</div>
+        </div>
+        <div class="ps-list">${sidebarHtml}</div>
+      </div>
+    </div>`;
+}
+
+function toggleDone(mi, li) {
+  if (!activeCourse) return;
+  activeCourse.modules[mi].lessons[li].done = !activeCourse.modules[mi].lessons[li].done;
+  // Update progress
+  const total = activeCourse.modules.reduce((s,m)=>s+m.lessons.length,0);
+  const done  = activeCourse.modules.reduce((s,m)=>s+m.lessons.filter(l=>l.done).length,0);
+  activeCourse.progress = Math.round(done/total*100);
+  renderPlayer();
+}
+
+// ══════════ MY COURSES ══════════
+function renderMyCourses() {
+  const owned = COURSES.filter(c=>c.owned);
+  const certs = owned.filter(c=>c.progress===100);
+
+  let html = `<div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px">
+    ${owned.map(c=>`
+      <div class="my-course-card" onclick="openCourse(${c.id})">
+        <div class="mcc-cover" style="background:${COLORS[c.cat]||COLORS.basics}">${c.emoji}</div>
+        <div class="mcc-info">
+          <div class="mcc-title">${c.title}</div>
+          <div class="mcc-prog-wrap">
+            <div class="mcc-prog-bar"><div class="mcc-prog-fill" style="width:${c.progress}%"></div></div>
+            <div class="mcc-pct">${c.progress}%</div>
+          </div>
+          <div class="mcc-meta">${c.lessons} уроків · ${c.duration} · ${c.level}</div>
+        </div>
+        <button class="mcc-btn" onclick="event.stopPropagation();openCourse(${c.id},true)">Продовжити →</button>
+      </div>`).join('')}
+  </div>`;
+
+  if(certs.length){
+    html += `<div class="section-title">Сертифікати</div><div style="display:flex;flex-direction:column;gap:10px">
+      ${certs.map(c=>`<div class="cert-card">
+        <div class="cert-icon">🏆</div>
+        <div><div class="cert-title">${c.title}</div><div class="cert-date">Завершено · травень 2025</div></div>
+        <button class="cert-btn">Завантажити PDF</button>
+      </div>`).join('')}
+    </div>`;
+  } else {
+    html += `<div class="gc gcp" style="text-align:center;padding:28px">
+      <div style="font-size:28px;margin-bottom:10px;opacity:.4">🏆</div>
+      <div style="font-size:14px;font-weight:700;color:var(--text2);margin-bottom:6px">Ще немає сертифікатів</div>
+      <div style="font-size:12.5px;color:var(--text3)">Пройди курс до кінця щоб отримати сертифікат</div>
+    </div>`;
+  }
+  document.getElementById('my-courses-content').innerHTML = html;
+}
+
+// ══════════ INIT ══════════
+renderCatalog();
+renderMyCourses();
+</script>
+</body>
+</html>
